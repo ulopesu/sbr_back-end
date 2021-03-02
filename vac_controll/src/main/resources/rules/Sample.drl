@@ -1,0 +1,11 @@
+package com.sample
+ 
+import com.sample.Camara;
+ 
+rule "Camara com Temperatura Alta"
+    when
+        camara: Camara(name : nome, local : loc, gests : gestores, vacs : vacinas, temp: temperatura>= 25.0)
+    then
+        camara.chamarGestor();
+end
+

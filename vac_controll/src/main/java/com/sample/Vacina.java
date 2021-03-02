@@ -1,15 +1,15 @@
-package vac_controll;
+package com.sample;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Vacina {
 	private String nome;
 	private double tempMax;
 	private double tempMin;
-	private Date validade;
+	private LocalDate validade;
 	private boolean util;
 	
-	public Vacina(String nome, double tempMax, double tempMin, Date validade, boolean util) {
+	public Vacina(String nome, double tempMax, double tempMin, LocalDate validade, boolean util) {
 		super();
 		this.nome = nome;
 		this.tempMax = tempMax;
@@ -42,11 +42,11 @@ public class Vacina {
 		this.tempMin = tempMin;
 	}
 	
-	public Date getValidade() {
+	public LocalDate getValidade() {
 		return validade;
 	}
 	
-	public void setValidade(Date validade) {
+	public void setValidade(LocalDate validade) {
 		this.validade = validade;
 	}
 	

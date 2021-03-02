@@ -1,6 +1,5 @@
-package vac_controll;
+package com.sample;
 
-import vac_controll.Camara;
 import java.util.Date;
 
 public class LogCamara {
