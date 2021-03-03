@@ -65,8 +65,19 @@ public class Camara implements Cloneable {
         return super.clone();
     }
 	
+	
+	// TODO
+	/*
+		FUNCOES:
+		NOTIFICAR_GESTORES
+
+		CHAMAR_GESTO_MAIS_PROX
+	 */
+	
 	public void chamarGestor() {
 		Gestor gMaisProx = this.loc.gestorMaisProx(this.gestores);
+		
+		//TODO: ENVIAR
 		gMaisProx.enviarMsg(this);
 	}
 	

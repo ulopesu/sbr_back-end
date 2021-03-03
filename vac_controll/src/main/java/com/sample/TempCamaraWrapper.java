@@ -26,6 +26,7 @@ public class TempCamaraWrapper implements Runnable {
 	public void run() {
 		while(true) {
 			try {
+				//TODO: BUSCAR VALORES DA API
 				Random rand = new Random();
 				Double valor = 5.0 + rand.nextInt(21);
 				

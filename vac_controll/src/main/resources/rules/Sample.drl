@@ -1,6 +1,21 @@
 package com.sample
  
 import com.sample.Camara;
+
+
+//TODO: FAZER AS 3 REGRAS CORRETAMENTE
+/*
+	Caso a temperatura de uma câmara de vacina chegue perto dos limites dos
+	parâmetros, deve-se notificar os gestores;
+	
+	Caso a temperatura de uma câmara de vacina fique fora dos limites dos
+	parâmetros definidos (situação grave), o gestor que estiver mais perto do local
+	do armazenamento da vacina deve ser chamado para comparecer ao local;
+	
+	Caso a temperatura de uma câmara de vacina fique fora dos limites dos
+	parâmetros definidos durante um certo intervalo de tempo (a ser definido), o
+	sistema deve sugerir o descarte do produto. (VERIFICAR INTEGRIDADE DA VAC)
+*/
  
 rule "Camara com Temperatura Alta"
     when

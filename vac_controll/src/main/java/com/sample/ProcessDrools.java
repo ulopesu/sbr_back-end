@@ -58,7 +58,7 @@ public class ProcessDrools {
             
             Camara cam_1 = new Camara(
             	"Cariacica",
-	    		new Localizacao(-20.33279537493192, -40.38528979403148),
+	    		new Localizacao(-20.34900255555123, -40.3901474607013),
 	    		Arrays.asList(gestor1, gestor2),
 	    		Arrays.asList(vac_1, vac_2), 
 	    		0
