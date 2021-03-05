@@ -17,10 +17,20 @@ import com.sample.Camara;
 	sistema deve sugerir o descarte do produto. (VERIFICAR INTEGRIDADE DA VAC)
 */
  
-rule "Camara com Temperatura Alta"
+
+rule "Lote com Temperatura Proxima ao Limiar"
     when
-        camara: Camara(name : nome, local : loc, gests : gestores, vacs : vacinas, temp: temperatura>= 25.0)
+    	$loteRisco: Lote($qtd : qtd, $cam : cam , $vac : vac, $validade : validade, $util: util, $tl : ehTempLimiar == true,  $tr : ehTempRuim)
     then
-        camara.chamarGestor();
+        $loteRisco.getCam().notificarGestores($loteRisco);
 end
+
+
+rule "Lote com Temperatura Proxima Ruim"
+    when
+    	$loteRisco: Lote($qtd : qtd, $cam : cam , $vac : vac, $validade : validade, $util: util, $tl : ehTempLimiar,  $tr : ehTempRuim == true)
+    then
+        $loteRisco.getCam().chamarGestor($loteRisco);
+end
+
 

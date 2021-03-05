@@ -1,5 +1,9 @@
 package com.sample;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Random;
 
 import org.kie.api.runtime.KieSession;
@@ -10,13 +14,15 @@ import com.sun.xml.internal.ws.api.addressing.AddressingVersion.EPR;
 public class TempCamaraWrapper implements Runnable {
 	KieSession kSession;
 	FactHandle fact;
+	String url;
 	
 	
 	
-	public TempCamaraWrapper(KieSession kSession, FactHandle fact) {
+	public TempCamaraWrapper(KieSession kSession, FactHandle fact, String url) {
 		super();
 		this.kSession = kSession;
 		this.fact = fact;
+		this.url = url;
 	}
 	
 	
@@ -26,12 +32,52 @@ public class TempCamaraWrapper implements Runnable {
 	public void run() {
 		while(true) {
 			try {
-				//TODO: BUSCAR VALORES DA API
+
+	            HttpURLConnection conexao = (HttpURLConnection) new URL(this.url).openConnection();
+
+	            conexao.setRequestMethod("GET");
+	            conexao.setRequestProperty("Accept", "application/json");
+
+	            if (conexao.getResponseCode() != 200) {
+	                System.out.println("Erro " + conexao.getResponseCode() + " ao obter dados da URL " + url);
+	            }
+
+	            BufferedReader br = new BufferedReader(new InputStreamReader((conexao.getInputStream())));
+
+	            String output = "";
+	            String line;
+	            
+	            while ((line = br.readLine()) != null) {
+	                output += line;
+	            }
+	            
+	            //{info: "25.00,42.00,Sexta-11:04:46"}
+	            
+	            conexao.disconnect();
+	            
+	            //System.out.println(output);
+	            
+	            Double temp = Double.parseDouble(output.substring(9, 14));
+	            //System.out.println(temp);
+	            
+	            Double umi = Double.parseDouble(output.substring(15, 20));
+	            //System.out.println(umi);
+	            
+	            int idFinal = output.indexOf('}');
+	            String dataSTR = output.substring(21, idFinal-1);
+	            //System.out.println(dataSTR);
+				
+	            
 				Random rand = new Random();
 				Double valor = 5.0 + rand.nextInt(21);
 				
 				Camara cam = (Camara) kSession.getObject(fact);
 				cam.setTemperatura(valor);
+				
+				for (Lote lote : cam.getLotes()) {
+					lote.checarTempLimiar();
+					lote.checarTempRuim();
+				}
 				
 				kSession.update(fact, cam);
 				kSession.fireAllRules();

@@ -6,16 +6,15 @@ public class Vacina {
 	private String nome;
 	private double tempMax;
 	private double tempMin;
-	private LocalDate validade;
-	private boolean util;
 	
-	public Vacina(String nome, double tempMax, double tempMin, LocalDate validade, boolean util) {
+	public static Vacina NOT_FOUND = new Vacina("", 0, 0);
+
+	
+	public Vacina(String nome, double tempMax, double tempMin) {
 		super();
 		this.nome = nome;
 		this.tempMax = tempMax;
 		this.tempMin = tempMin;
-		this.validade = validade;
-		this.util = util;
 	}
 	
 	public String getNome() {
@@ -41,21 +40,5 @@ public class Vacina {
 	public void setTempMin(double tempMin) {
 		this.tempMin = tempMin;
 	}
-	
-	public LocalDate getValidade() {
-		return validade;
-	}
-	
-	public void setValidade(LocalDate validade) {
-		this.validade = validade;
-	}
-	
-	public boolean isUtil() {
-		return util;
-	}
-	
-	public void setUtil(boolean util) {
-		this.util = util;
-	}
-	
+
 }

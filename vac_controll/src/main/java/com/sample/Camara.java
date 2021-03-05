@@ -1,21 +1,31 @@
 package com.sample;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Camara implements Cloneable {
 	private String nome;
 	private Localizacao loc;
 	private List<Gestor> gestores;
-	private List<Vacina> vacinas;
+	private List<Lote> lotes;
 	private double temperatura;
+	private double umidade;
 	
-	public Camara(String nome, Localizacao loc, List<Gestor> gestores, List<Vacina> vacinas, double temperatura) {
+	public static Camara NOT_FOUND = new Camara("", new Localizacao(0.0,0.0), new ArrayList<Gestor>(), new ArrayList<Lote>(), 0,0);
+	
+	public Camara(String nome, Localizacao loc, List<Gestor> gestores, List<Lote> lotes, double temperatura, double umidade) {
 		super();
 		this.nome = nome;
 		this.loc = loc;
 		this.gestores = gestores;
-		this.vacinas = vacinas;
+		this.lotes = lotes;
 		this.temperatura = temperatura;
+		this.umidade = umidade;
+		
+		for (Lote lote : this.lotes) {
+			lote.setCam(this);
+		}
 	}
 
 	public String getNome() {
@@ -43,12 +53,12 @@ public class Camara implements Cloneable {
 		this.gestores = gestores;
 	}
 
-	public List<Vacina> getVacinas() {
-		return vacinas;
+	public List<Lote> getLotes() {
+		return lotes;
 	}
 
-	public void setVacinas(List<Vacina> vacinas) {
-		this.vacinas = vacinas;
+	public void setLotes(List<Lote> lotes) {
+		this.lotes = lotes;
 	}
 
 	public double getTemperatura() {
@@ -60,21 +70,26 @@ public class Camara implements Cloneable {
 		this.temperatura = temperatura;
 	}
 	
-	
+	public double getUmidade() {
+		return umidade;
+	}
+
+	public void setUmidade(double umidade) {
+		this.umidade = umidade;
+	}
+
 	public Object clone() throws CloneNotSupportedException {		
         return super.clone();
     }
 	
-	
-	// TODO
-	/*
-		FUNCOES:
-		NOTIFICAR_GESTORES
 
-		CHAMAR_GESTO_MAIS_PROX
-	 */
+	public void notificarGestores(Lote loteRisco) {
+		for (Gestor gestor : this.gestores) {
+			gestor.enviarMsg(this);
+		}
+	}
 	
-	public void chamarGestor() {
+	public void chamarGestor(Lote loteRisco) {
 		Gestor gMaisProx = this.loc.gestorMaisProx(this.gestores);
 		
 		//TODO: ENVIAR

@@ -41,31 +41,38 @@ public class ProcessDrools {
         	Vacina vac_1 = new Vacina(
 				"corona vac", 
 				15, 
-				5, 
-				LocalDate.of(2022, 06, 01),
-				true
+				5
 			);
         	FactHandle conona_vac = kSession.insert(vac_1);
         	
         	Vacina vac_2 = new Vacina(
 				"sputnik v", 
 				10, 
-				3, 
-				LocalDate.of(2022, 01, 01),
-				true
+				3
 			);
         	FactHandle sputnik_v = kSession.insert(vac_2);
+        	
+        	
+        	Lote lote1 = new Lote(20, vac_1, LocalDate.of(2022, 01, 15), true);
+        	FactHandle lote1_F = kSession.insert(lote1);
+        	
+        	Lote lote2 = new Lote(10, vac_2, LocalDate.of(2022, 01, 15), true);
+        	FactHandle lote2_F = kSession.insert(lote2);
             
             Camara cam_1 = new Camara(
             	"Cariacica",
 	    		new Localizacao(-20.34900255555123, -40.3901474607013),
 	    		Arrays.asList(gestor1, gestor2),
-	    		Arrays.asList(vac_1, vac_2), 
+	    		Arrays.asList(lote1, lote2), 
+	    		0,
 	    		0
 	    	);
             FactHandle cam_Cariacica = kSession.insert(cam_1);
             
-            Thread t1 = new Thread(new TempCamaraWrapper(kSession, cam_Cariacica));
+            
+			//TODO: ENTRADA DE DADOS POR ARQUIVO (URL)
+            String url = "https://api-temp-umid.herokuapp.com/";
+            Thread t1 = new Thread(new TempCamaraWrapper(kSession, cam_Cariacica, url));
             t1.start();
             
             
