@@ -2,7 +2,11 @@ package com.sample;
 
 import java.time.LocalDate;
 
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.rule.FactHandle;
+
 public class Vacina {
+	private FactHandle fact;
 	private String nome;
 	private double tempMax;
 	private double tempMin;
@@ -39,6 +43,18 @@ public class Vacina {
 	
 	public void setTempMin(double tempMin) {
 		this.tempMin = tempMin;
+	}
+
+	public FactHandle getFact() {
+		return fact;
+	}
+
+	public void setFact(FactHandle fact) {
+		this.fact = fact;
+	}
+	
+	public void updatekSession(KieSession kSession) {
+		kSession.update(this.fact, this);
 	}
 
 }

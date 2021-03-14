@@ -1,6 +1,11 @@
 package com.sample;
 
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.rule.FactHandle;
+
 public class Gestor {
+	private Camara cam;
+	private FactHandle fact;
 	private String nome;
 	private String email;
 	private String telefone;
@@ -48,6 +53,27 @@ public class Gestor {
 		this.loc = loc;
 	}
 	
+	public FactHandle getFact() {
+		return fact;
+	}
+
+	public void setFact(FactHandle fact) {
+		this.fact = fact;
+	}
+	
+	public Camara getCam() {
+		return cam;
+	}
+
+	public void setCam(Camara cam) {
+		this.cam = cam;
+	}
+	
+	public void updatekSession(KieSession kSession) {
+		kSession.update(this.fact, this);
+		this.cam.updatekSession(kSession);
+	}
+	
 	public void enviarMsg(Camara cam) {
 		System.out.println(
 			"\n ALERTA -> Camara de " + cam.getNome() +
@@ -56,4 +82,5 @@ public class Gestor {
 			", favor se dirigir ao local! \n"
 		);
 	}
+
 }

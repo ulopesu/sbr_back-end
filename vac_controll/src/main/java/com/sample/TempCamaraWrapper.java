@@ -13,25 +13,21 @@ import com.sun.xml.internal.ws.api.addressing.AddressingVersion.EPR;
 
 public class TempCamaraWrapper implements Runnable {
 	KieSession kSession;
-	FactHandle fact;
+	Camara cam;
 	String url;
-	
-	
-	
-	public TempCamaraWrapper(KieSession kSession, FactHandle fact, String url) {
+
+	public TempCamaraWrapper(KieSession kSession, Camara cam, String url) {
 		super();
 		this.kSession = kSession;
-		this.fact = fact;
+		this.cam = cam;
 		this.url = url;
 	}
-	
-	
-
 
 	@Override
 	public void run() {
 		while(true) {
 			try {
+				/*
 
 	            HttpURLConnection conexao = (HttpURLConnection) new URL(this.url).openConnection();
 
@@ -67,22 +63,16 @@ public class TempCamaraWrapper implements Runnable {
 	            String dataSTR = output.substring(21, idFinal-1);
 	            //System.out.println(dataSTR);
 				
-	            
+	            */
 				Random rand = new Random();
-				Double valor = 5.0 + rand.nextInt(21);
+				Double valor = 4.0 + rand.nextInt(12);
 				
-				Camara cam = (Camara) kSession.getObject(fact);
 				cam.setTemperatura(valor);
-				
-				for (Lote lote : cam.getLotes()) {
-					lote.checarTempLimiar();
-					lote.checarTempRuim();
-				}
-				
-				kSession.update(fact, cam);
+				cam.updatekSession(kSession);
+
 				kSession.fireAllRules();
 				
-				Thread.sleep(100);
+				Thread.sleep(1000);
 			} catch (Exception e) {
 				// TODO: handle exception
 				e.printStackTrace();

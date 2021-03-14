@@ -28,7 +28,7 @@ public class ProcessDrools {
     			"1236478", 
     			new Localizacao(-20.338067121605047, -40.36906294598647)
     		);
-        	kSession.insert(gestor1);
+        	gestor1.setFact(kSession.insert(gestor1));
         	
         	Gestor gestor2 = new Gestor(
 				"Usi", 
@@ -36,28 +36,28 @@ public class ProcessDrools {
 				"1236478", 
 				new Localizacao(-20.352434313227818, -40.385297697254835)
 			);
-        	kSession.insert(gestor2);
+        	gestor1.setFact(kSession.insert(gestor2));
 
         	Vacina vac_1 = new Vacina(
 				"corona vac", 
 				15, 
 				5
 			);
-        	FactHandle conona_vac = kSession.insert(vac_1);
+        	vac_1.setFact(kSession.insert(vac_1));
         	
         	Vacina vac_2 = new Vacina(
 				"sputnik v", 
-				10, 
-				3
+				15, 
+				5
 			);
-        	FactHandle sputnik_v = kSession.insert(vac_2);
+        	vac_2.setFact(kSession.insert(vac_2));
         	
         	
         	Lote lote1 = new Lote(20, vac_1, LocalDate.of(2022, 01, 15), true);
-        	FactHandle lote1_F = kSession.insert(lote1);
+        	lote1.setFact(kSession.insert(lote1));
         	
         	Lote lote2 = new Lote(10, vac_2, LocalDate.of(2022, 01, 15), true);
-        	FactHandle lote2_F = kSession.insert(lote2);
+        	lote2.setFact(kSession.insert(lote2));
             
             Camara cam_1 = new Camara(
             	"Cariacica",
@@ -67,12 +67,12 @@ public class ProcessDrools {
 	    		0,
 	    		0
 	    	);
-            FactHandle cam_Cariacica = kSession.insert(cam_1);
+            cam_1.setFact(kSession.insert(cam_1));
             
             
 			//TODO: ENTRADA DE DADOS POR ARQUIVO (URL)
             String url = "https://api-temp-umid.herokuapp.com/";
-            Thread t1 = new Thread(new TempCamaraWrapper(kSession, cam_Cariacica, url));
+            Thread t1 = new Thread(new TempCamaraWrapper(kSession, cam_1, url));
             t1.start();
             
             

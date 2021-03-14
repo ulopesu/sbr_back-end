@@ -4,7 +4,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.rule.FactHandle;
+
 public class Camara implements Cloneable {
+	private FactHandle fact;
 	private String nome;
 	private Localizacao loc;
 	private List<Gestor> gestores;
@@ -25,6 +29,10 @@ public class Camara implements Cloneable {
 		
 		for (Lote lote : this.lotes) {
 			lote.setCam(this);
+		}
+		
+		for (Gestor gestor : this.gestores) {
+			gestor.setCam(this);
 		}
 	}
 
@@ -77,19 +85,38 @@ public class Camara implements Cloneable {
 	public void setUmidade(double umidade) {
 		this.umidade = umidade;
 	}
+	
+	public FactHandle getFact() {
+		return fact;
+	}
 
+	public void setFact(FactHandle fact) {
+		this.fact = fact;
+	}
+	
+	
+	public void updatekSession(KieSession kSession) {
+		kSession.update(this.fact, this);
+		
+		for (Lote lote : this.lotes) {
+			lote.updatekSession(kSession);
+		}
+	}
+	
+	
+	
 	public Object clone() throws CloneNotSupportedException {		
         return super.clone();
     }
 	
-
-	public void notificarGestores(Lote loteRisco) {
+	
+	public void notificarGestores() {
 		for (Gestor gestor : this.gestores) {
 			gestor.enviarMsg(this);
 		}
 	}
 	
-	public void chamarGestor(Lote loteRisco) {
+	public void chamarGestor() {
 		Gestor gMaisProx = this.loc.gestorMaisProx(this.gestores);
 		
 		//TODO: ENVIAR

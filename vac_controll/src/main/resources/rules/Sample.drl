@@ -17,20 +17,52 @@ import com.sample.Camara;
 	sistema deve sugerir o descarte do produto. (VERIFICAR INTEGRIDADE DA VAC)
 */
  
+/*
+//PERGUNTAR PATRICIA
 
-rule "Lote com Temperatura Proxima ao Limiar"
+rule "Lote TempLimiar"
     when
-    	$loteRisco: Lote($qtd : qtd, $cam : cam , $vac : vac, $validade : validade, $util: util, $tl : ehTempLimiar == true,  $tr : ehTempRuim)
+    	$lote: Lote((vac.getTempMin() < cam.getTemperatura() && (vac.getTempMin()+2) > cam.getTemperatura()) || (vac.getTempMax() > cam.getTemperatura() && (vac.getTempMax()-2) < cam.getTemperatura()))
+    	
     then
-        $loteRisco.getCam().notificarGestores($loteRisco);
+    	System.out.println("\nCAMARA: "+  $lote.getCam().getNome() +" - tempCam:" +  $lote.getCam().getTemperatura());
+        $lote.getCam().notificarGestores();
+end
+*/
+
+// SUGESTÃO: CRIAR TPO ENUMERADO PARA MENSAGENS PADRONIZADAS.
+
+rule "Lote Temp Limiar Negativo"
+    when
+    	$lote: Lote(checarTempLimiar==1)
+    then
+    	System.out.println("\nTemp Limiar Negativo -> " + "CAMARA: "+  $lote.getCam().getNome() +" - tempCam:" +  $lote.getCam().getTemperatura());
+        $lote.getCam().notificarGestores();
+end
+
+rule "Lote Temp Limiar Positivo"
+    when
+    	$lote: Lote(checarTempLimiar==2)
+    then
+    	System.out.println("\nTemp Limiar Positivo -> " + "CAMARA: "+  $lote.getCam().getNome() +" - tempCam:" +  $lote.getCam().getTemperatura());
+        $lote.getCam().notificarGestores();
 end
 
 
-rule "Lote com Temperatura Proxima Ruim"
+rule "Lote Temp Ruim Negativo"
     when
-    	$loteRisco: Lote($qtd : qtd, $cam : cam , $vac : vac, $validade : validade, $util: util, $tl : ehTempLimiar,  $tr : ehTempRuim == true)
+    	$lote: Lote(checarTempRuim==1)
     then
-        $loteRisco.getCam().chamarGestor($loteRisco);
+    	System.out.println("\nTemp Ruim Negativo -> " + "CAMARA: "+  $lote.getCam().getNome() +" - tempCam:" +  $lote.getCam().getTemperatura());
+        $lote.getCam().chamarGestor();
+end
+
+rule "Lote Temp Ruim Positivo"
+    when
+    	$lote: Lote(checarTempRuim==2)
+    then
+    	System.out.println("\nTemp Ruim Positivo -> " + "CAMARA: "+  $lote.getCam().getNome() +" - tempCam:" +  $lote.getCam().getTemperatura());
+        $lote.getCam().chamarGestor();
 end
 
 
