@@ -10,9 +10,9 @@ public class Gestor {
 	private String email;
 	private String telefone;
 	private Localizacao loc;
-	
+
 	public static Gestor NOT_FOUND = new Gestor("Gestor Nulo", "", "", new Localizacao(0.0, 0.0));
-	
+
 	public Gestor(String nome, String email, String telefone, Localizacao loc) {
 		super();
 		this.nome = nome;
@@ -20,39 +20,39 @@ public class Gestor {
 		this.telefone = telefone;
 		this.loc = loc;
 	}
-	
+
 	public String getNome() {
 		return nome;
 	}
-	
+
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
-	
+
 	public String getEmail() {
 		return email;
 	}
-	
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
+
 	public String getTelefone() {
 		return telefone;
 	}
-	
+
 	public void setTelefone(String telefone) {
 		this.telefone = telefone;
 	}
-	
+
 	public Localizacao getLoc() {
 		return loc;
 	}
-	
+
 	public void setLoc(Localizacao loc) {
 		this.loc = loc;
 	}
-	
+
 	public FactHandle getFact() {
 		return fact;
 	}
@@ -60,7 +60,7 @@ public class Gestor {
 	public void setFact(FactHandle fact) {
 		this.fact = fact;
 	}
-	
+
 	public Camara getCam() {
 		return cam;
 	}
@@ -68,19 +68,38 @@ public class Gestor {
 	public void setCam(Camara cam) {
 		this.cam = cam;
 	}
-	
+
 	public void updatekSession(KieSession kSession) {
 		kSession.update(this.fact, this);
 		this.cam.updatekSession(kSession);
 	}
-	
-	public void enviarMsg(Camara cam) {
-		System.out.println(
-			"\n ALERTA -> Camara de " + cam.getNome() +
-			" está com a temperatura elevada. " + 
-			this.nome + 
-			", favor se dirigir ao local! \n"
-		);
+
+	public void enviarMsg(Camara cam, int check) {
+		switch (check) {
+		case 1:
+			System.out.println(	"ALERTA -> Temperatura da Camara("+cam.getNome()+") "
+								+ "está próxima do limite negativo.");
+			break;
+
+		case 2:
+			System.out.println(	"ALERTA -> Temperatura da Camara("+cam.getNome()+") "
+								+ "está próxima do limite positivo.");
+			break;
+
+		case 4:
+			System.out.println(	"ALERTA -> Temperatura da Camara("+cam.getNome()+") "
+								+ "ultrapassou limite negativo. " +this.nome+ " dirija-se ao local.");
+			break;
+
+		case 5:
+			System.out.println(	"ALERTA -> Temperatura da Camara("+cam.getNome()+") "
+					+ "ultrapassou limite positivo. " +this.nome+ " dirija-se ao local.");
+			break;
+
+		default:
+			// code block
+		}
+
 	}
 
 }

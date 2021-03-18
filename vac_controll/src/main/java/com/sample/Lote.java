@@ -117,7 +117,7 @@ public class Lote {
 		} else if (this.vac.getTempMin() < this.cam.getTemperatura() && (this.vac.getTempMin()+2) > this.cam.getTemperatura()) {
 			return 1;
 		} else {
-			return 0;
+			return 3;
 		}
 	}
 	
@@ -134,12 +134,12 @@ public class Lote {
 	*/
 	
 	public int checarTempRuim() {
-		if(this.vac.getTempMax() <= this.cam.getTemperatura()) {
-			return 2;
-		} else if (this.vac.getTempMin() >= this.cam.getTemperatura()) {
-			return 1;
+		if(this.vac.getTempMax() < this.cam.getTemperatura()) {
+			return 5;
+		} else if (this.vac.getTempMin() > this.cam.getTemperatura()) {
+			return 4;
 		} else {
-			return 0;
+			return 6;
 		}
 	}
 

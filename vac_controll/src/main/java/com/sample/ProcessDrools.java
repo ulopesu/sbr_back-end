@@ -36,7 +36,7 @@ public class ProcessDrools {
 				"1236478", 
 				new Localizacao(-20.352434313227818, -40.385297697254835)
 			);
-        	gestor1.setFact(kSession.insert(gestor2));
+        	gestor2.setFact(kSession.insert(gestor2));
 
         	Vacina vac_1 = new Vacina(
 				"corona vac", 

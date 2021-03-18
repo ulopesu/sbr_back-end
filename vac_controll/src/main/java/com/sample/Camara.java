@@ -110,17 +110,17 @@ public class Camara implements Cloneable {
     }
 	
 	
-	public void notificarGestores() {
+	public void notificarGestores(int check) {
 		for (Gestor gestor : this.gestores) {
-			gestor.enviarMsg(this);
+			gestor.enviarMsg(this, check);
 		}
 	}
 	
-	public void chamarGestor() {
+	public void chamarGestor(int check) {
 		Gestor gMaisProx = this.loc.gestorMaisProx(this.gestores);
 		
 		//TODO: ENVIAR
-		gMaisProx.enviarMsg(this);
+		gMaisProx.enviarMsg(this, check);
 	}
 	
 }

@@ -2,6 +2,8 @@ package com.sample
  
 import com.sample.Camara;
 
+import java.util.Date;
+import java.util.ArrayList;
 
 //TODO: FAZER AS 3 REGRAS CORRETAMENTE
 /*
@@ -32,37 +34,106 @@ end
 
 // SUGESTÃO: CRIAR TPO ENUMERADO PARA MENSAGENS PADRONIZADAS.
 
+
+declare TempRuimMax
+	lote: Lote;
+	temp: double;
+	present: boolean;
+	starded: Date;
+	finished: Date;
+end
+
+declare TempRuimMin
+	lote: Lote;
+	temp: double;
+	present: boolean;
+	starded: Date;
+	finished: Date;
+end
+
+declare descarte
+	lote: Lote;
+end
+
+
 rule "Lote Temp Limiar Negativo"
     when
-    	$lote: Lote(checarTempLimiar==1)
+    	$lote: Lote($check: checarTempLimiar==1, util==true)
     then
-    	System.out.println("\nTemp Limiar Negativo -> " + "CAMARA: "+  $lote.getCam().getNome() +" - tempCam:" +  $lote.getCam().getTemperatura());
-        $lote.getCam().notificarGestores();
+        $lote.getCam().notificarGestores($check);
 end
 
 rule "Lote Temp Limiar Positivo"
     when
-    	$lote: Lote(checarTempLimiar==2)
+    	$lote: Lote($check:checarTempLimiar==2, util==true)
     then
-    	System.out.println("\nTemp Limiar Positivo -> " + "CAMARA: "+  $lote.getCam().getNome() +" - tempCam:" +  $lote.getCam().getTemperatura());
-        $lote.getCam().notificarGestores();
+        $lote.getCam().notificarGestores($check);
 end
 
 
 rule "Lote Temp Ruim Negativo"
     when
-    	$lote: Lote(checarTempRuim==1)
+    	$lote: Lote($check:checarTempRuim==4, $temp: cam.getTemperatura(), util==true)
+    	not (exists (TempRuimMin(lote==$lote, present==true)))
     then
-    	System.out.println("\nTemp Ruim Negativo -> " + "CAMARA: "+  $lote.getCam().getNome() +" - tempCam:" +  $lote.getCam().getTemperatura());
-        $lote.getCam().chamarGestor();
+        $lote.getCam().chamarGestor($check);
+        insert (new TempRuimMin($lote, $temp, true, new Date(), null));
 end
 
 rule "Lote Temp Ruim Positivo"
     when
-    	$lote: Lote(checarTempRuim==2)
+    	$lote: Lote($check:checarTempRuim==5, $temp: cam.getTemperatura(), util==true)
+    	not (exists (TempRuimMax(lote==$lote, present==true)))
     then
-    	System.out.println("\nTemp Ruim Positivo -> " + "CAMARA: "+  $lote.getCam().getNome() +" - tempCam:" +  $lote.getCam().getTemperatura());
-        $lote.getCam().chamarGestor();
+        $lote.getCam().chamarGestor($check);
+        insert (new TempRuimMax($lote, $temp, true, new Date(), null));
 end
+
+rule "Lote Temp Min OK"
+    when
+    	$lote: Lote($check:checarTempRuim==6, util==true)
+    	$tempRuim: TempRuimMin(lote==$lote, present==true)
+    then
+		$tempRuim.setPresent(false);
+		$tempRuim.setFinished(new Date());
+		update($tempRuim);
+end
+
+
+rule "Lote Temp Max OK"
+    when
+    	$lote: Lote($check:checarTempRuim==6, util==true)
+    	$tempRuim: TempRuimMax(lote==$lote, present==true)
+    then
+		$tempRuim.setPresent(false);
+		$tempRuim.setFinished(new Date());
+		update($tempRuim);
+end
+
+
+rule "Descarte TempMin"
+	when
+		$lote: Lote($vac:vac, util==true)
+		TempRuimMin(lote == $lote, (System.currentTimeMillis() - starded.getTime()) > 10)
+	then
+		$lote.setUtil(false);
+		update($lote);
+		insertLogical(new descarte($lote));
+		System.out.println("Descarte TempMin");
+end
+
+
+rule "Descarte TempMax"
+	when
+		$lote: Lote($vac:vac, util==true)
+		TempRuimMax(lote == $lote, (System.currentTimeMillis() - starded.getTime()) > 10)
+	then
+		$lote.setUtil(false);
+		update($lote);
+		insertLogical(new descarte($lote));
+		System.out.println("Descarte TempMax");
+end
+
+
 
 
