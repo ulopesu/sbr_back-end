@@ -40,30 +40,32 @@ public class ProcessDrools {
 
         	Vacina vac_1 = new Vacina(
 				"corona vac", 
-				15, 
-				5
+				12, 
+				5,
+				20
 			);
         	vac_1.setFact(kSession.insert(vac_1));
         	
         	Vacina vac_2 = new Vacina(
 				"sputnik v", 
-				15, 
-				5
+				18, 
+				5,
+				30
 			);
         	vac_2.setFact(kSession.insert(vac_2));
         	
         	
-        	Lote lote1 = new Lote(20, vac_1, LocalDate.of(2022, 01, 15), true);
+        	Lote lote1 = new Lote(20, vac_1, LocalDate.of(2022, 01, 15));
         	lote1.setFact(kSession.insert(lote1));
         	
-        	Lote lote2 = new Lote(10, vac_2, LocalDate.of(2022, 01, 15), true);
-        	lote2.setFact(kSession.insert(lote2));
+        	//Lote lote2 = new Lote(10, vac_2, LocalDate.of(2022, 01, 15));
+        	//lote2.setFact(kSession.insert(lote2));
             
             Camara cam_1 = new Camara(
             	"Cariacica",
 	    		new Localizacao(-20.34900255555123, -40.3901474607013),
 	    		Arrays.asList(gestor1, gestor2),
-	    		Arrays.asList(lote1, lote2), 
+	    		Arrays.asList(lote1), 
 	    		0,
 	    		0
 	    	);

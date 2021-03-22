@@ -1,5 +1,8 @@
 package com.sample;
 
+import java.sql.Date;
+import java.time.LocalDate;
+
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
 
@@ -74,28 +77,45 @@ public class Gestor {
 		this.cam.updatekSession(kSession);
 	}
 
-	public void enviarMsg(Camara cam, int check) {
-		switch (check) {
-		case 1:
-			System.out.println(	"ALERTA -> Temperatura da Camara("+cam.getNome()+") "
+	public void enviarMsg(Camara cam, Lote lote, CodigoAlerta cod) {
+		switch (cod) {
+		case MARGEM_MIN:
+			System.out.println(	"\nALERTA -> Temperatura da Camara("+cam.getNome()+") "
 								+ "está próxima do limite negativo.");
 			break;
 
-		case 2:
-			System.out.println(	"ALERTA -> Temperatura da Camara("+cam.getNome()+") "
+		case MARGEM_MAX:
+			System.out.println(	"\nALERTA -> Temperatura da Camara("+cam.getNome()+") "
 								+ "está próxima do limite positivo.");
 			break;
 
-		case 4:
-			System.out.println(	"ALERTA -> Temperatura da Camara("+cam.getNome()+") "
+		case TEMP_MIN:
+			System.out.println(	"\nALERTA -> Temperatura da Camara("+cam.getNome()+") "
 								+ "ultrapassou limite negativo. " +this.nome+ " dirija-se ao local.");
 			break;
 
-		case 5:
-			System.out.println(	"ALERTA -> Temperatura da Camara("+cam.getNome()+") "
+		case TEMP_MAX:
+			System.out.println(	"\nALERTA -> Temperatura da Camara("+cam.getNome()+") "
 					+ "ultrapassou limite positivo. " +this.nome+ " dirija-se ao local.");
 			break;
+	
+		case DESCARTE_MIN:
+			System.out.println(	
+					"\nALERTA -> Descarte na Camara("+cam.getNome()+"):\n" +
+					"Vacina: "+ lote.getVac().getNome() + "." +
+					"\nValidade: " + lote.getValidade() + "." +
+					"\nQuantidade: " + lote.getQtd() + "."
+					);
+			break;
 
+		case DESCARTE_MAX:
+			System.out.println(	
+					"\nALERTA -> Descarte na Camara("+cam.getNome()+"):\n" +
+					"Vacina: "+ lote.getVac().getNome() + "." +
+					".\nValidade: " + lote.getValidade() + "." +
+					".\nQuantidade: " + lote.getQtd() + "."
+					);
+			break;
 		default:
 			// code block
 		}

@@ -23,7 +23,6 @@ public class TempCamaraWrapper implements Runnable {
 		this.url = url;
 	}
 
-	@Override
 	public void run() {
 		while(true) {
 			try {
@@ -65,8 +64,8 @@ public class TempCamaraWrapper implements Runnable {
 				
 	            */
 				Random rand = new Random();
-				//Double valor = 4.0 + rand.nextInt(12);
-				Double valor = 16.0;
+				Double valor = 4.0 + rand.nextInt(12);
+				//Double valor = 16.0;
 				cam.setTemperatura(valor);
 				cam.updatekSession(kSession);
 

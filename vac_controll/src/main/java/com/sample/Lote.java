@@ -18,14 +18,14 @@ public class Lote {
 	private boolean ehTempRuim;
 
 	
-	public static Lote NOT_FOUND = new Lote(0, Vacina.NOT_FOUND, LocalDate.of(0, 1, 1), false);
+	public static Lote NOT_FOUND = new Lote(0, Vacina.NOT_FOUND, LocalDate.of(0, 1, 1));
 	
-	public Lote(int qtd, Vacina vac, LocalDate validade, boolean util) {
+	public Lote(int qtd, Vacina vac, LocalDate validade) {
 		super();
 		this.qtd = qtd;
 		this.vac = vac;
 		this.validade = validade;
-		this.util = util;
+		this.util = true;
 		this.ehTempLimiar = false;
 		this.ehTempRuim = false;
 	}
@@ -99,47 +99,27 @@ public class Lote {
 		kSession.update(this.fact, this);
 		this.vac.updatekSession(kSession);
 	}
-	/*
-	public boolean checarTempLimiar() {
-		if((this.vac.getTempMin() < this.cam.getTemperatura() && (this.vac.getTempMin()+2) > this.cam.getTemperatura()) || 
-		   (this.vac.getTempMax() > this.cam.getTemperatura() && (this.vac.getTempMax()-2) < this.cam.getTemperatura())) {
-			this.ehTempLimiar = true;
-			return true;
+
+	
+	public CodigoAlerta checarTempLimiar() {
+		if(this.vac.getTempMax() > this.cam.getTemperatura() && (this.vac.getTempMax()-this.vac.getTemp_margem()) < this.cam.getTemperatura()) {
+			return CodigoAlerta.MARGEM_MAX;
+		} else if (this.vac.getTempMin() < this.cam.getTemperatura() && (this.vac.getTempMin()+this.vac.getTemp_margem()) > this.cam.getTemperatura()) {
+			return CodigoAlerta.MARGEM_MIN;
 		} else {
-			this.ehTempLimiar = false;
-			return false;
-		}
-	}
-	*/
-	public int checarTempLimiar() {
-		if(this.vac.getTempMax() > this.cam.getTemperatura() && (this.vac.getTempMax()-2) < this.cam.getTemperatura()) {
-			return 2;
-		} else if (this.vac.getTempMin() < this.cam.getTemperatura() && (this.vac.getTempMin()+2) > this.cam.getTemperatura()) {
-			return 1;
-		} else {
-			return 3;
+			return CodigoAlerta.TEMP_OK;
 		}
 	}
 	
-	/*
-	public boolean checarTempRuim() {
-		if(this.vac.getTempMax() <= this.cam.getTemperatura() || this.vac.getTempMin() >= this.cam.getTemperatura()) {
-			this.ehTempRuim = true;
-			return true;
-		} else {
-			this.ehTempRuim = false;
-			return false;
-		}
-	}
-	*/
+
 	
-	public int checarTempRuim() {
+	public CodigoAlerta checarTempRuim() {
 		if(this.vac.getTempMax() < this.cam.getTemperatura()) {
-			return 5;
+			return CodigoAlerta.TEMP_MAX;
 		} else if (this.vac.getTempMin() > this.cam.getTemperatura()) {
-			return 4;
+			return CodigoAlerta.TEMP_MIN;
 		} else {
-			return 6;
+			return CodigoAlerta.TEMP_OK;
 		}
 	}
 
