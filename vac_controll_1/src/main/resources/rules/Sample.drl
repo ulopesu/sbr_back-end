@@ -9,19 +9,14 @@ function long currentTime(){
   return System.currentTimeMillis();
 }
 
-//TODO: FAZER AS 3 REGRAS CORRETAMENTE
-/*
-	Caso a temperatura de uma câmara de vacina chegue perto dos limites dos
-	parâmetros, deve-se notificar os gestores;
-	
-	Caso a temperatura de uma câmara de vacina fique fora dos limites dos
-	parâmetros definidos (situação grave), o gestor que estiver mais perto do local
-	do armazenamento da vacina deve ser chamado para comparecer ao local;
-	
-	Caso a temperatura de uma câmara de vacina fique fora dos limites dos
-	parâmetros definidos durante um certo intervalo de tempo (a ser definido), o
-	sistema deve sugerir o descarte do produto. (VERIFICAR INTEGRIDADE DA VAC)
+//TODO:
+/*	
+	- CRIAR IMPORT PARA TODOS OS OBJETOS USANDO JSON
+	- COMENTAR CÓDIGO
+	- FAZER DIAGRAMA UML
+	- PREPARAR SLIDES
 */
+
 
 
 /*
@@ -35,9 +30,6 @@ Sugestões de roteiro para apresentações (com uso de slides) – 30 minutos ca
 - Demonstração da ferramenta...
 
 
-
-
---- ANALISAR VARIACAO ENTRE TEMPERATURAS EXTREMAS!
 */
 
 
