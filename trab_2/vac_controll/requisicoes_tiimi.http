@@ -1,0 +1,93 @@
+###
+###     CRUD VACINA
+###
+
+@URL_API = http://127.0.0.1:8080
+@contentType = application/json
+
+
+#   LIST VACINA
+GET {{ URL_API }}/vacina/
+Content-Type: application/json
+
+{}
+###
+
+#   CREATE VACINA
+POST {{ URL_API }}/vacina/
+Content-Type: application/json
+
+{
+    "nome": "corona vac",
+    "tempMax": 15.0,
+    "tempMin": 5.0,
+    "margem": 6.24
+}
+###
+
+
+#   UPDATE VACINA
+PUT {{ URL_API }}/vacina/2/
+Content-Type: application/json
+
+{
+    "nome": "sputnik V",
+    "tempMax": 20.0,
+    "tempMin": 0.0,
+    "margem": 10
+}
+###
+
+
+#   DELETE VACINA
+DELETE  {{ URL_API }}/vacina/1/
+Content-Type: application/json
+
+{}
+###
+
+
+###
+###     CRUD LOTE
+###
+
+
+#   LIST LOTE
+GET {{ URL_API }}/lote/
+Content-Type: application/json
+
+{}
+###
+
+#   CREATE LOTE
+POST {{ URL_API }}/lote/
+Content-Type: application/json
+
+{
+    "qtd": 3,
+    "vacina": null,
+    "validade": "2018-01-07",
+    "util": true
+}
+###
+
+
+#   UPDATE LOTE
+PUT {{ URL_API }}/lote/2/
+Content-Type: application/json
+
+{
+    "nome": "sputnik V",
+    "tempMax": 20.0,
+    "tempMin": 0.0,
+    "margem": 10
+}
+###
+
+
+#   DELETE LOTE
+DELETE  {{ URL_API }}/lote/1/
+Content-Type: application/json
+
+{}
+###
