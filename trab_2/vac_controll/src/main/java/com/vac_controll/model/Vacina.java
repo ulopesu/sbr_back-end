@@ -1,12 +1,13 @@
 package com.vac_controll.model;
 
+import java.util.List;
+import java.util.Optional;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
@@ -31,13 +32,7 @@ public class Vacina {
 	private double tempMin;
 	
 	@Column(nullable = false)
-	private double margem; 	
-	
-    @OneToOne
-    @JoinColumn(name = "lote_id")
-	private Lote lote;
-	
-	
+	private double margem;
 							// Porcentagem da temperatura de risco,
 							// baseada na temperatura maxima.
 							// Ex: tempMax = 30 e margem = 10 produz uma
@@ -108,7 +103,7 @@ public class Vacina {
 	public void setId(Long id) {
 		this.id = id;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

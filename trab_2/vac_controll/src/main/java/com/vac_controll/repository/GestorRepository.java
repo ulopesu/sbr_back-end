@@ -1,11 +1,15 @@
 package com.vac_controll.repository;
 
-import org.springframework.data.repository.CrudRepository;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.vac_controll.model.Gestor;
 
 @Repository
-public interface GestorRepository extends CrudRepository<Gestor, Long> {
-
+public interface GestorRepository extends JpaRepository<Gestor, Long> {
+	
+	List<Gestor> findByCamaraId(Long id);
 }

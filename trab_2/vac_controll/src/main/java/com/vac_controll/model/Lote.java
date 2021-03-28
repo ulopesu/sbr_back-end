@@ -9,10 +9,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
+
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 public class Lote {
@@ -31,7 +35,10 @@ public class Lote {
     @JoinColumn(name="camara_id")
 	private Camara camara;
 	
-    @OneToOne(mappedBy = "lote")
+    @ManyToOne()
+    @JoinColumn(name = "vacina_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIdentityReference(alwaysAsId = true)
 	private Vacina vacina;
 	
 	@Column(nullable = false)
@@ -51,6 +58,9 @@ public class Lote {
 		this.util = true;
 	}
 
+    public Lote() {
+    }
+	
 	public int getQtd() {
 		return qtd;
 	}
@@ -67,15 +77,7 @@ public class Lote {
 	public void setCam(Camara cam) {
 		this.camara = cam;
 	}
-
-	public Vacina getVac() {
-		return vacina;
-	}
-
-	public void setVac(Vacina vac) {
-		this.vacina = vac;
-	}
-
+	
 	public LocalDate getValidade() {
 		return validade;
 	}
@@ -108,6 +110,14 @@ public class Lote {
 		this.id = id;
 	}
 	
+	public Vacina getVacina() {
+		return vacina;
+	}
+
+	public void setVacina(Vacina vacina) {
+		this.vacina = vacina;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

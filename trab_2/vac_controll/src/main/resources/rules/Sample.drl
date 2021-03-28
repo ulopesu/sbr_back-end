@@ -3,6 +3,8 @@ package com.vac_controll.model;
 import java.util.Date;
 import java.util.ArrayList;
 
+import com.vac_controll.controller.LoteController
+
 function long currentTime(){
   return System.currentTimeMillis();
 }
@@ -55,14 +57,16 @@ rule "Lote Temp Limiar Negativo"
     when
     	$lote: Lote(checarTempLimiar==CodigoAlerta.MARGEM_MIN, $util:util==true)
     then
-        $lote.getCam().notificarGestores(CodigoAlerta.MARGEM_MIN, $lote);
+        LoteController l_c = new LoteController();
+		l_c.notificarGestores(CodigoAlerta.DESCARTE_MAX, $lote); 
 end
 
 rule "Lote Temp Limiar Positivo"
     when
     	$lote: Lote(checarTempLimiar==CodigoAlerta.MARGEM_MAX, util==true)
     then
-        $lote.getCam().notificarGestores(CodigoAlerta.MARGEM_MAX, $lote);
+        LoteController l_c = new LoteController();
+		l_c.notificarGestores(CodigoAlerta.DESCARTE_MAX, $lote); 
 end
 
 
@@ -73,7 +77,8 @@ rule "Lote Temp Ruim Negativo"
     	not (exists (TempRuimMin(lote==$lote, valido==true)))
     then
     	insert (new TempRuimMin($lote, $temp, new Date(), null, true));
-        $cam.chamarGestor(CodigoAlerta.TEMP_MIN, $lote);
+        LoteController l_c = new LoteController();
+		l_c.chamarGestor(CodigoAlerta.DESCARTE_MAX, $lote); 
 end
 
 
@@ -84,7 +89,8 @@ rule "Lote Temp Ruim Positivo"
     	not (exists (TempRuimMax(lote==$lote, valido==true)))
     then
     	insert (new TempRuimMax($lote, $temp, new Date(), null, true));
-        $cam.chamarGestor(CodigoAlerta.TEMP_MAX, $lote);  
+        LoteController l_c = new LoteController();
+		l_c.chamarGestor(CodigoAlerta.DESCARTE_MAX, $lote); 
 end
 
 
@@ -114,7 +120,7 @@ end
 
 rule "Descarte TempMin"
 	when
-		$lote: Lote($cam:cam, $vac:vac, util==true)
+		$lote: Lote($cam:cam, $vac:vacina, util==true)
 		Camara(this==$cam, $temp:temperatura)
 		TempRuimMin(lote == $lote, $inicioTime: inicio.getTime(), valido==true)
 		eval((currentTime()-$inicioTime) > Constante.LimiteExposicao)
@@ -122,21 +128,23 @@ rule "Descarte TempMin"
 		insertLogical(new descarte($lote));
 		$lote.setUtil(false);
 		update($lote);
-		$cam.notificarGestores(CodigoAlerta.DESCARTE_MIN, $lote); 
+		LoteController l_c = new LoteController();
+		l_c.notificarGestores(CodigoAlerta.DESCARTE_MIN, $lote); 
 end
 
 
 rule "Descarte TempMax"
 	when
-		$lote: Lote($cam:cam, $vac:vac, util==true)
+		$lote: Lote($cam:cam, $vac:vacina, util==true)
 		TempRuimMax(lote == $lote, $inicioTime: inicio.getTime(), valido==true)
 		eval((currentTime()-$inicioTime) > Constante.LimiteExposicao)
 		Camara(this==$cam, $temp:temperatura)
 	then
 		insertLogical(new descarte($lote));
 		$lote.setUtil(false);
-		update($lote);	
-		$cam.notificarGestores(CodigoAlerta.DESCARTE_MAX, $lote); 
+		update($lote);
+		LoteController l_c = new LoteController();
+		l_c.notificarGestores(CodigoAlerta.DESCARTE_MAX, $lote); 
 end
 
 

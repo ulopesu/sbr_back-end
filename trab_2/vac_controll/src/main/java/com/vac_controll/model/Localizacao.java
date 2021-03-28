@@ -26,6 +26,10 @@ public class Localizacao {
 		this.latitude = latitude;
 	}
 	
+	public Localizacao() {
+		
+	}
+	
 	public Double getLongitude() {
 		return longitude;
 	}

@@ -6,14 +6,21 @@
 @contentType = application/json
 
 
-#   LIST VACINA
+#   LIST
 GET {{ URL_API }}/vacina/
 Content-Type: application/json
 
 {}
 ###
 
-#   CREATE VACINA
+#   RETRIVE
+GET {{ URL_API }}/vacina/1
+Content-Type: application/json
+
+{}
+###
+
+#   CREATE
 POST {{ URL_API }}/vacina/
 Content-Type: application/json
 
@@ -21,13 +28,13 @@ Content-Type: application/json
     "nome": "corona vac",
     "tempMax": 15.0,
     "tempMin": 5.0,
-    "margem": 6.24
+    "margem": 10
 }
 ###
 
 
-#   UPDATE VACINA
-PUT {{ URL_API }}/vacina/2/
+#   UPDATE
+PUT {{ URL_API }}/vacina/1/
 Content-Type: application/json
 
 {
@@ -39,7 +46,7 @@ Content-Type: application/json
 ###
 
 
-#   DELETE VACINA
+#   DELETE
 DELETE  {{ URL_API }}/vacina/1/
 Content-Type: application/json
 
@@ -52,42 +59,184 @@ Content-Type: application/json
 ###
 
 
-#   LIST LOTE
+#   LIST
 GET {{ URL_API }}/lote/
 Content-Type: application/json
 
 {}
 ###
 
-#   CREATE LOTE
+#   RETRIVE
+GET {{ URL_API }}/lote/
+Content-Type: application/json
+
+{}
+###
+
+#   CREATE
 POST {{ URL_API }}/lote/
 Content-Type: application/json
 
 {
     "qtd": 3,
-    "vacina": null,
+    "vacina": {
+        "id": 1
+    },
     "validade": "2018-01-07",
     "util": true
 }
 ###
 
 
-#   UPDATE LOTE
+#   UPDATE
 PUT {{ URL_API }}/lote/2/
 Content-Type: application/json
 
 {
-    "nome": "sputnik V",
-    "tempMax": 20.0,
-    "tempMin": 0.0,
-    "margem": 10
+    "qtd": 3,
+    "vacina": {
+        "id": 2
+    },
+    "validade": "2018-01-07",
+    "util": true
 }
 ###
 
 
-#   DELETE LOTE
+#   DELETE
 DELETE  {{ URL_API }}/lote/1/
 Content-Type: application/json
 
 {}
 ###
+
+
+
+###
+###     CRUD CAMARA
+###
+
+
+
+#   LIST
+GET {{ URL_API }}/camara/
+Content-Type: application/json
+
+{}
+
+###
+
+#   RETRIVE
+GET {{ URL_API }}/camara/1
+Content-Type: application/json
+
+{}
+###
+
+#   CREATE
+POST {{ URL_API }}/camara/
+Content-Type: application/json
+
+{
+    "nome": "Camara de Cariacica",
+    "loc": {
+        "latitude": -20.33262247031378,
+        "longitude": -40.377734714473526
+    },
+    "temperatura": 10.0,
+    "umidade": 80.0
+}
+###
+
+
+#   UPDATE
+PUT {{ URL_API }}/camara/2
+Content-Type: application/json
+
+{
+    "nome": "Camara de Vitoria",
+    "loc": {
+        "latitude": -20.33262247031378,
+        "longitude": -40.377734714473526
+    },
+    "temperatura": 10.0,
+    "umidade": 80.0
+}
+###
+
+#   DELETE
+DELETE  {{ URL_API }}/camara/2
+Content-Type: application/json
+
+{}
+
+###
+
+
+
+###
+###     CRUD GESTOR
+###
+
+
+
+#   LIST
+GET {{ URL_API }}/gestor/
+Content-Type: application/json
+
+{}
+
+###
+
+#   RETRIVE
+GET {{ URL_API }}/gestor/1
+Content-Type: application/json
+
+{}
+###
+
+#   CREATE
+POST {{ URL_API }}/gestor/
+Content-Type: application/json
+
+{
+    "nome": "Usi",
+    "email": "usi@ufes.br",
+    "telefone": "(27) 99999-9999",
+    "loc": {
+        "latitude": -20.33262247031378,
+        "longitude": -40.377734714473526
+    },
+    "cam": null
+}
+###
+
+
+#   UPDATE
+PUT {{ URL_API }}/gestor/2
+Content-Type: application/json
+
+{
+    "nome": "Bel",
+    "email": "bel@ufes.br",
+    "telefone": "(27) 98888-8888",
+    "loc": {
+        "latitude": -20.33262247031378,
+        "longitude": -40.377734714473526
+    },
+    "cam": null
+}
+###
+
+#   DELETE
+DELETE  {{ URL_API }}/gestor/2
+Content-Type: application/json
+
+{}
+
+###
+
+
+
+
+

@@ -8,14 +8,22 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.vac_controll.repository.GestorRepository;
 
 @Entity
 public class Camara {
+	
+	//@Autowired
+	//private GestorRepository gestorRepository;
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false)
@@ -27,16 +35,9 @@ public class Camara {
 	@Column(nullable = false)
 	private String nome;
 	
-	@ManyToOne
+    @OneToOne
+    @JoinColumn(name = "loc_id")
 	private Localizacao loc;
-	
-    @OneToMany(mappedBy = "camara")
-    @Column(nullable = false)
-	private List<Gestor> gestores;
-	
-	@OneToMany(mappedBy = "camara")
-	@Column(nullable = false)
-	private List<Lote> lotes;
 	
 	@Column(nullable = false)
 	private double temperatura;
@@ -50,19 +51,12 @@ public class Camara {
 		super();
 		this.nome = nome;
 		this.loc = loc;
-		this.gestores = gestores;
-		this.lotes = lotes;
 		this.temperatura = temperatura;
 		this.umidade = umidade;
-		
-		for (Lote lote : this.lotes) {
-			lote.setCam(this);
-		}
-		
-		for (Gestor gestor : this.gestores) {
-			gestor.setCam(this);
-		}
 	}
+	
+    public Camara() {
+    }
 
 	public String getNome() {
 		return nome;
@@ -81,22 +75,6 @@ public class Camara {
 	}
 	
 	
-	public List<Gestor> getGestores() {
-		return gestores;
-	}
-
-	public void setGestores(List<Gestor> gestores) {
-		this.gestores = gestores;
-	}
-
-	public List<Lote> getLotes() {
-		return lotes;
-	}
-
-	public void setLotes(List<Lote> lotes) {
-		this.lotes = lotes;
-	}
-
 	public double getTemperatura() {
 		return temperatura;
 	}
@@ -154,25 +132,22 @@ public class Camara {
 			return false;
 		return true;
 	}
-
-	public void updatekSession(KieSession kSession) {
-		kSession.update(this.fact, this);
-		
-		for (Lote lote : this.lotes) {
-			lote.updatekSession(kSession);
-		}
-	}
 	
+	/*
 	public void notificarGestores(CodigoAlerta cod, Lote lote) {
-		for (Gestor gestor : this.gestores) {
+		List<Gestor> gestores = gestorRepository.findByCamaraId(this.id);
+		for (Gestor gestor : gestores) {
 			gestor.enviarMsg(this, lote, cod);
 		}
 	}
+	*/
 	
+	/*
 	public void chamarGestor(CodigoAlerta cod, Lote lote) {
-		Gestor gMaisProx = this.loc.gestorMaisProx(this.gestores);
+		List<Gestor> gestores = gestorRepository.findByCamaraId(this.id);
+		Gestor gMaisProx = this.loc.gestorMaisProx(gestores);
 		//System.out.println(lote.getVac().getNome());
 		gMaisProx.enviarMsg(this, lote, cod);
 	}
-	
+	*/
 }
