@@ -3,16 +3,12 @@ package com.vac_controll;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.vac_controll.model.FireRules;
-
 @SpringBootApplication
 public class VacControllApplication {
 	public static final void main(String[] args) {
 		
 		SpringApplication.run(VacControllApplication.class, args);
-		
-		//Thread t1 = new Thread(new FireRules()); 
-		//t1.start();
+
 	}
 }
 

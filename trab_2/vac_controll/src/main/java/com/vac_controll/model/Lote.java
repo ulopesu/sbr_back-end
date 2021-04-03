@@ -16,7 +16,9 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
 
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 @Entity
 public class Lote {
@@ -24,9 +26,6 @@ public class Lote {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	@Column(nullable = true)
-	private transient FactHandle fact;
 	
 	@Column(nullable = false)
 	private int qtd;
@@ -48,7 +47,7 @@ public class Lote {
 	private boolean util;
 
 	
-	public static Lote NOT_FOUND = new Lote(0, Vacina.NOT_FOUND, LocalDate.of(0, 1, 1));
+	public static Lote NOT_FOUND = new Lote();
 	
 	public Lote(int qtd, Vacina vacina, LocalDate validade) {
 		super();
@@ -69,15 +68,14 @@ public class Lote {
 		this.qtd = qtd;
 	}
 	
-	
-	public Camara getCam() {
+	public Camara getCamara() {
 		return camara;
 	}
 
-	public void setCam(Camara cam) {
-		this.camara = cam;
+	public void setCamara(Camara camara) {
+		this.camara = camara;
 	}
-	
+
 	public LocalDate getValidade() {
 		return validade;
 	}
@@ -92,14 +90,6 @@ public class Lote {
 
 	public void setUtil(boolean util) {
 		this.util = util;
-	}
-	
-	public FactHandle getFact() {
-		return fact;
-	}
-
-	public void setFact(FactHandle fact) {
-		this.fact = fact;
 	}
 
 	public Long getId() {
@@ -143,12 +133,8 @@ public class Lote {
 		return true;
 	}
 
-	public void updatekSession(KieSession kSession) {
-		kSession.update(this.fact, this);
-		this.vacina.updatekSession(kSession);
-	}
-
 	public CodigoAlerta checarTempLimiar() {
+		System.out.println("checarTempLimiar");
 		if(this.vacina.getTempMax() >= this.camara.getTemperatura() && (this.vacina.getTempMax()-this.vacina.getTemp_margem()) <= this.camara.getTemperatura()) {
 			return CodigoAlerta.MARGEM_MAX;
 		} else if (this.vacina.getTempMin() <= this.camara.getTemperatura() && (this.vacina.getTempMin()+this.vacina.getTemp_margem()) >= this.camara.getTemperatura()) {
@@ -160,6 +146,7 @@ public class Lote {
 	
 
 	public CodigoAlerta checarTempRuim() {
+		System.out.println("checarTempRuim");
 		if(this.vacina.getTempMax() <= this.camara.getTemperatura()) {
 			return CodigoAlerta.TEMP_MAX;
 		} else if (this.vacina.getTempMin() >= this.camara.getTemperatura()) {

@@ -3,6 +3,7 @@ package com.vac_controll.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vac_controll.model.Camara;
+import com.vac_controll.model.Constante;
 import com.vac_controll.model.Localizacao;
 import com.vac_controll.repository.CamaraRepository;
 import com.vac_controll.repository.LocalizacaoRepository;
@@ -43,6 +45,7 @@ public class CamaraController {
 		if (cam.getLoc()!=null) {
 			cam.setLoc(locRepository.save(cam.getLoc()));
 		}
+
 		return camRepository.save(cam);
 	}
 	

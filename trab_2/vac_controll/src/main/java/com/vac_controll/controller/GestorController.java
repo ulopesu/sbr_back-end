@@ -3,6 +3,7 @@ package com.vac_controll.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vac_controll.model.Camara;
+import com.vac_controll.model.Constante;
 import com.vac_controll.model.Gestor;
 import com.vac_controll.model.Lote;
 import com.vac_controll.model.Vacina;
@@ -54,11 +56,11 @@ public class GestorController {
 		}
 
 		// SET CAMARA BY ID
-		if (gestor.getCam() != null) {
-			Long cam_id = gestor.getCam().getId();
+		if (gestor.getCamara() != null) {
+			Long cam_id = gestor.getCamara().getId();
 			Optional<Camara> cam = camRepository.findById(cam_id);
 			cam.ifPresent((my_cam) -> {
-				gestor.setCam(my_cam);
+				gestor.setCamara(my_cam);
 			});
 		}
 
@@ -77,11 +79,11 @@ public class GestorController {
 			}
 
 			// SET CAMARA BY ID
-			if (gestor.getCam() != null) {
-				Long cam_id = gestor.getCam().getId();
+			if (gestor.getCamara() != null) {
+				Long cam_id = gestor.getCamara().getId();
 				Optional<Camara> cam = camRepository.findById(cam_id);
 				cam.ifPresent((my_cam) -> {
-					record.setCam(my_cam);
+					record.setCamara(my_cam);
 				});
 			}
 			Gestor updated = gestorRepository.save(record);

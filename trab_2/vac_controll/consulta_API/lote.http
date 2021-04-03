@@ -1,0 +1,65 @@
+###
+###     CRUD LOTE
+###
+
+@URL_API = http://127.0.0.1:8080
+@contentType = application/json
+
+
+#   LIST
+GET {{ URL_API }}/lote/
+Content-Type: application/json
+
+{}
+###
+
+#   RETRIVE
+GET {{ URL_API }}/lote/
+Content-Type: application/json
+
+{}
+###
+
+#   CREATE
+POST {{ URL_API }}/lote/
+Content-Type: application/json
+
+{
+    "qtd": 3,
+    "vacina": {
+        "id": 1
+    },
+    "camara": {
+        "id": 1
+    },
+    "validade": "2018-01-07",
+    "util": true
+
+}
+###
+
+
+#   UPDATE
+PUT {{ URL_API }}/lote/2/
+Content-Type: application/json
+
+{
+    "qtd": 3,
+    "vacina": {
+        "id": 4
+    },
+    "validade": "2018-01-07",
+    "util": true,
+    "camara": {
+        "id": 1
+    }
+}
+###
+
+
+#   DELETE
+DELETE  {{ URL_API }}/lote/1/
+Content-Type: application/json
+
+{}
+###

@@ -1,22 +1,13 @@
 package com.vac_controll.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.rule.FactHandle;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.vac_controll.repository.GestorRepository;
 
 @Entity
 public class Camara {
@@ -28,9 +19,6 @@ public class Camara {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false)
 	private Long id;
-	
-	@Column(nullable = true)
-	private transient FactHandle fact;
 	
 	@Column(nullable = false)
 	private String nome;
@@ -45,16 +33,16 @@ public class Camara {
 	@Column(nullable = false)
 	private double umidade;
 	
-	public static Camara NOT_FOUND = new Camara("", new Localizacao(0.0,0.0), new ArrayList<Gestor>(), new ArrayList<Lote>(), 0,0);
+	public static Camara NOT_FOUND = new Camara("", new Localizacao(0.0,0.0), 0,0);
 	
-	public Camara(String nome, Localizacao loc, List<Gestor> gestores, List<Lote> lotes, double temperatura, double umidade) {
+	public Camara(String nome, Localizacao loc, double temperatura, double umidade) {
 		super();
 		this.nome = nome;
 		this.loc = loc;
 		this.temperatura = temperatura;
 		this.umidade = umidade;
 	}
-	
+
     public Camara() {
     }
 
@@ -91,15 +79,7 @@ public class Camara {
 	public void setUmidade(double umidade) {
 		this.umidade = umidade;
 	}
-	
-	public FactHandle getFact() {
-		return fact;
-	}
 
-	public void setFact(FactHandle fact) {
-		this.fact = fact;
-	}
-	
 	public Long getId() {
 		return id;
 	}
@@ -132,22 +112,4 @@ public class Camara {
 			return false;
 		return true;
 	}
-	
-	/*
-	public void notificarGestores(CodigoAlerta cod, Lote lote) {
-		List<Gestor> gestores = gestorRepository.findByCamaraId(this.id);
-		for (Gestor gestor : gestores) {
-			gestor.enviarMsg(this, lote, cod);
-		}
-	}
-	*/
-	
-	/*
-	public void chamarGestor(CodigoAlerta cod, Lote lote) {
-		List<Gestor> gestores = gestorRepository.findByCamaraId(this.id);
-		Gestor gMaisProx = this.loc.gestorMaisProx(gestores);
-		//System.out.println(lote.getVac().getNome());
-		gMaisProx.enviarMsg(this, lote, cod);
-	}
-	*/
 }

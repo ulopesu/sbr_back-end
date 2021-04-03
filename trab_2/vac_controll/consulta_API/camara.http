@@ -1,0 +1,61 @@
+###
+###     CRUD CAMARA
+###
+
+@URL_API = http://127.0.0.1:8080
+@contentType = application/json
+
+
+#   LIST
+GET {{ URL_API }}/camara/
+Content-Type: application/json
+
+{}
+
+###
+
+#   RETRIVE
+GET {{ URL_API }}/camara/1
+Content-Type: application/json
+
+{}
+###
+
+#   CREATE
+POST {{ URL_API }}/camara/
+Content-Type: application/json
+
+{
+    "nome": "Camara de Cariacica",
+    "loc": {
+        "latitude": -20.33262247031378,
+        "longitude": -40.377734714473526
+    },
+    "temperatura": 15.0,
+    "umidade": 80.0
+}
+###
+
+
+#   UPDATE
+PUT {{ URL_API }}/camara/1
+Content-Type: application/json
+
+{
+    "nome": "Camara de Vitoria",
+    "loc": {
+        "latitude": -20.33262247031378,
+        "longitude": -40.377734714473526
+    },
+    "temperatura": 15.0,
+    "umidade": 80.0
+}
+###
+
+#   DELETE
+DELETE  {{ URL_API }}/camara/2
+Content-Type: application/json
+
+{}
+
+###

@@ -12,15 +12,16 @@ import javax.persistence.Id;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
 @Entity
 public class Vacina {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	@Column(nullable = true)
-	private transient FactHandle fact;
 	
 	@Column(nullable = false)
 	private String nome;
@@ -38,7 +39,7 @@ public class Vacina {
 							// Ex: tempMax = 30 e margem = 10 produz uma
 							// temperatura de seguranca de 3 graus.
 
-	public static Vacina NOT_FOUND = new Vacina("", 0, 0, 0);
+	public static Vacina NOT_FOUND = new Vacina();
 
 	public Vacina(String nome, double tempMax, double tempMin, double margemSeguranca) {
 		super();
@@ -73,14 +74,6 @@ public class Vacina {
 
 	public void setTempMin(double tempMin) {
 		this.tempMin = tempMin;
-	}
-
-	public FactHandle getFact() {
-		return fact;
-	}
-
-	public void setFact(FactHandle fact) {
-		this.fact = fact;
 	}
 
 	public double getMargem() {
@@ -127,10 +120,6 @@ public class Vacina {
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
-	}
-
-	public void updatekSession(KieSession kSession) {
-		kSession.update(this.fact, this);
 	}
 
 }

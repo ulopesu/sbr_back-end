@@ -3,6 +3,7 @@ package com.vac_controll.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vac_controll.model.Camara;
 import com.vac_controll.model.CodigoAlerta;
+import com.vac_controll.model.Constante;
 import com.vac_controll.model.Gestor;
 import com.vac_controll.model.Lote;
 import com.vac_controll.model.Vacina;
@@ -31,7 +33,7 @@ import com.vac_controll.repository.VacinaRepository;
 public class LoteController {
 
 	@Autowired
-	private LoteRepository repository;
+	private LoteRepository loteRepository;
 
 	@Autowired
 	private VacinaRepository vacRepository;
@@ -44,15 +46,15 @@ public class LoteController {
 
 	@GetMapping
 	public Iterable<Lote> list() {
-		return repository.findAll();
+		return loteRepository.findAll();
 	}
 
 	@PostMapping
 	@ResponseStatus
 	public Lote create(@RequestBody Lote lote) {
 		// SET VACINA BY ID
-		
-		if(lote.getVacina() != null) {
+
+		if (lote.getVacina() != null) {
 			Long vac_id = lote.getVacina().getId();
 			Optional<Vacina> vac = vacRepository.findById(vac_id);
 			vac.ifPresent((my_vac) -> {
@@ -61,31 +63,40 @@ public class LoteController {
 		}
 
 		// SET CAMARA BY ID
-		if (lote.getCam()!= null) {
-			Long cam_id = lote.getCam().getId();
+		if (lote.getCamara() != null) {
+			Long cam_id = lote.getCamara().getId();
 			Optional<Camara> cam = camRepository.findById(cam_id);
 			cam.ifPresent((my_cam) -> {
-				lote.setCam(my_cam);
+				lote.setCamara(my_cam);
 			});
 		}
 
-
-		return repository.save(lote);
+		if (loteRepository.count() == 0) {
+			Thread t1 = new Thread(
+				new FireRules(
+						vacRepository, 
+						camRepository, 
+						gestorRepository, 
+						loteRepository
+						)
+				);
+			t1.start();
+		}
+		return loteRepository.save(lote);
 	}
 
 	@GetMapping(value = "/{id}")
 	public Optional<Lote> retrive(@PathVariable("id") long id) {
-		return repository.findById(id);
+		return loteRepository.findById(id);
 	}
 
 	@PutMapping(value = "/{id}")
 	public ResponseEntity<Lote> update(@PathVariable("id") long id, @RequestBody Lote lote) {
-		return repository.findById(id).map(record -> {
+		return loteRepository.findById(id).map(record -> {
 			record.setQtd(lote.getQtd());
-			record.setCam(lote.getCam());
 			record.setValidade(lote.getValidade());
 			record.setUtil(lote.isUtil());
-			
+
 			// SET VACINA BY ID
 			Long vac_id = lote.getVacina().getId();
 			Optional<Vacina> vac = vacRepository.findById(vac_id);
@@ -94,35 +105,35 @@ public class LoteController {
 			});
 
 			// SET CAMARA BY ID
-			Long cam_id = lote.getCam().getId();
+			Long cam_id = lote.getCamara().getId();
 			Optional<Camara> cam = camRepository.findById(cam_id);
 			cam.ifPresent((my_cam) -> {
-				lote.setCam(my_cam);
+				lote.setCamara(my_cam);
 			});
-			
-			Lote updated = repository.save(record);
+
+			Lote updated = loteRepository.save(record);
 			return ResponseEntity.ok().body(updated);
 		}).orElse(ResponseEntity.notFound().build());
 	}
 
 	@DeleteMapping(path = { "/{id}" })
 	public ResponseEntity<?> delete(@PathVariable long id) {
-		return repository.findById(id).map(record -> {
-			repository.deleteById(id);
+		return loteRepository.findById(id).map(record -> {
+			loteRepository.deleteById(id);
 			return ResponseEntity.ok().build();
 		}).orElse(ResponseEntity.notFound().build());
 	}
 
 	public void notificarGestores(CodigoAlerta cod, Lote lote) {
-		List<Gestor> gestores = gestorRepository.findByCamaraId(lote.getCam().getId());
+		List<Gestor> gestores = gestorRepository.findByCamaraId(lote.getCamara().getId());
 		for (Gestor gestor : gestores) {
 			gestor.enviarMsg(lote, cod);
 		}
 	}
 
 	public void chamarGestor(CodigoAlerta cod, Lote lote) {
-		List<Gestor> gestores = gestorRepository.findByCamaraId(lote.getCam().getId());
-		Gestor gMaisProx = lote.getCam().getLoc().gestorMaisProx(gestores);
+		List<Gestor> gestores = gestorRepository.findByCamaraId(lote.getCamara().getId());
+		Gestor gMaisProx = lote.getCamara().getLoc().gestorMaisProx(gestores);
 		// System.out.println(lote.getVac().getNome());
 		gMaisProx.enviarMsg(lote, cod);
 	}

@@ -1,0 +1,70 @@
+###
+###     CRUD GESTOR
+###
+
+@URL_API = http://127.0.0.1:8080
+@contentType = application/json
+
+
+#   LIST
+GET {{ URL_API }}/gestor/
+Content-Type: application/json
+
+{}
+
+###
+
+#   RETRIVE
+GET {{ URL_API }}/gestor/1
+Content-Type: application/json
+
+{}
+###
+
+#   CREATE
+POST {{ URL_API }}/gestor/
+Content-Type: application/json
+
+{
+    "nome": "Usi",
+    "email": "usi@ufes.br",
+    "telefone": "(27) 99999-9999",
+    "loc": {
+        "latitude": -20.33262247031378,
+        "longitude": -40.377734714473526
+    },
+    "camara": {
+        "id": 1
+    }
+}
+###
+
+
+#   UPDATE
+PUT {{ URL_API }}/gestor/2
+Content-Type: application/json
+
+{
+    "nome": "Bel",
+    "email": "bel@ufes.br",
+    "telefone": "(27) 98888-8888",
+    "loc": {
+        "latitude": -20.33262247031378,
+        "longitude": -40.377734714473526
+    },
+    "cam": null
+}
+###
+
+#   DELETE
+DELETE  {{ URL_API }}/gestor/2
+Content-Type: application/json
+
+{}
+
+###
+
+
+
+
+
