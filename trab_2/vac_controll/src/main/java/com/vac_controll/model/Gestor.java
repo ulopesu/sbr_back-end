@@ -39,9 +39,9 @@ public class Gestor {
     @OneToOne
     @JoinColumn(name = "loc_id")
 	private Localizacao loc;
-
-	public static Gestor NOT_FOUND = new Gestor();
-
+    
+    public static Gestor NOT_FOUND = new Gestor();
+	
 	public Gestor(String nome, String email, String telefone, Localizacao loc) {
 		super();
 		this.nome = nome;

@@ -11,7 +11,6 @@ function long currentTime(){
 
 //TODO:
 /*	
-	- CRIAR IMPORT PARA TODOS OS OBJETOS USANDO JSON
 	- COMENTAR CÓDIGO
 	- FAZER DIAGRAMA UML
 	- PREPARAR SLIDES
@@ -28,8 +27,6 @@ Sugestões de roteiro para apresentações (com uso de slides) – 30 minutos ca
 
 - Como as funcionalidades citadas acima são implementadas (como o sistema é implementado em termos de regras drools, threads, sensores, etc.)
 - Demonstração da ferramenta...
-
-
 */
 
 declare TempRuimMax
@@ -52,30 +49,18 @@ declare descarte
 	lote: Lote;
 end
 
-rule "Lote"
-    when
-    	$lote: Lote()
-    then
-    	System.out.println("RUN");
-    	System.out.println($lote);
-        //LoteController l_c = new LoteController();
-		//l_c.notificarGestores(CodigoAlerta.DESCARTE_MAX, $lote); 
-end
+
 
 rule "Lote Temp Limiar Negativo"
     when
     	$lote: Lote(checarTempLimiar==CodigoAlerta.MARGEM_MIN, $util:util==true)
     then
-        //LoteController l_c = new LoteController();
-		//l_c.notificarGestores(CodigoAlerta.DESCARTE_MAX, $lote); 
 end
 
 rule "Lote Temp Limiar Positivo"
     when
     	$lote: Lote(checarTempLimiar==CodigoAlerta.MARGEM_MAX, util==true)
     then
-        //LoteController l_c = new LoteController();
-		//l_c.notificarGestores(CodigoAlerta.DESCARTE_MAX, $lote); 
 end
 
 
@@ -85,9 +70,7 @@ rule "Lote Temp Ruim Negativo"
     	Camara(this==$cam, $temp:temperatura)
     	not (exists (TempRuimMin(lote==$lote, valido==true)))
     then
-    	insert (new TempRuimMin($lote, $temp, new Date(), null, true));
-        //LoteController l_c = new LoteController();
-		//l_c.chamarGestor(CodigoAlerta.DESCARTE_MAX, $lote); 
+    	insert (new TempRuimMin($lote, $temp, new Date(), null, true)); 
 end
 
 
@@ -98,8 +81,6 @@ rule "Lote Temp Ruim Positivo"
     	not (exists (TempRuimMax(lote==$lote, valido==true)))
     then
     	insert (new TempRuimMax($lote, $temp, new Date(), null, true));
-        //LoteController l_c = new LoteController();
-		//l_c.chamarGestor(CodigoAlerta.DESCARTE_MAX, $lote); 
 end
 
 
@@ -108,7 +89,6 @@ rule "Lote Temp Dif Min"
     	$lote: Lote(checarTempRuim != CodigoAlerta.TEMP_MIN, util==true)
     	$tempRuim: TempRuimMin(lote==$lote, valido==true)
     then
-    	System.out.println("Temp Min OK");
 		$tempRuim.setFim(new Date());
 		$tempRuim.setValido(false);
 		update($tempRuim);
@@ -120,7 +100,6 @@ rule "Lote Temp Dif Max"
     	$lote: Lote(checarTempRuim != CodigoAlerta.TEMP_MAX, util==true)
     	$tempRuim: TempRuimMax(lote==$lote, valido==true)
     then
-    	System.out.println("Temp Max OK");
 		$tempRuim.setFim(new Date());
 		$tempRuim.setValido(false);
 		update($tempRuim);
@@ -137,8 +116,6 @@ rule "Descarte TempMin"
 		insertLogical(new descarte($lote));
 		$lote.setUtil(false);
 		update($lote);
-		//LoteController l_c = new LoteController();
-		//l_c.notificarGestores(CodigoAlerta.DESCARTE_MIN, $lote); 
 end
 
 
@@ -152,8 +129,6 @@ rule "Descarte TempMax"
 		insertLogical(new descarte($lote));
 		$lote.setUtil(false);
 		update($lote);
-		//LoteController l_c = new LoteController();
-		//l_c.notificarGestores(CodigoAlerta.DESCARTE_MAX, $lote); 
 end
 
 

@@ -33,8 +33,6 @@ public class Camara {
 	@Column(nullable = false)
 	private double umidade;
 	
-	public static Camara NOT_FOUND = new Camara("", new Localizacao(0.0,0.0), 0,0);
-	
 	public Camara(String nome, Localizacao loc, double temperatura, double umidade) {
 		super();
 		this.nome = nome;

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vac_controll.model.Camara;
 import com.vac_controll.model.CodigoAlerta;
 import com.vac_controll.model.Constante;
+import com.vac_controll.model.FireRules;
 import com.vac_controll.model.Gestor;
 import com.vac_controll.model.Lote;
 import com.vac_controll.model.Vacina;
@@ -134,7 +135,6 @@ public class LoteController {
 	public void chamarGestor(CodigoAlerta cod, Lote lote) {
 		List<Gestor> gestores = gestorRepository.findByCamaraId(lote.getCamara().getId());
 		Gestor gMaisProx = lote.getCamara().getLoc().gestorMaisProx(gestores);
-		// System.out.println(lote.getVac().getNome());
 		gMaisProx.enviarMsg(lote, cod);
 	}
 }

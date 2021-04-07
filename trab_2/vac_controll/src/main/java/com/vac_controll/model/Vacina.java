@@ -39,8 +39,6 @@ public class Vacina {
 							// Ex: tempMax = 30 e margem = 10 produz uma
 							// temperatura de seguranca de 3 graus.
 
-	public static Vacina NOT_FOUND = new Vacina();
-
 	public Vacina(String nome, double tempMax, double tempMin, double margemSeguranca) {
 		super();
 		this.nome = nome;

@@ -1,26 +1,17 @@
-package com.vac_controll.controller;
+package com.vac_controll.model;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.function.ToLongFunction;
 
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 
-import com.vac_controll.model.Camara;
-import com.vac_controll.model.Gestor;
-import com.vac_controll.model.Lote;
-import com.vac_controll.model.Vacina;
 import com.vac_controll.repository.CamaraRepository;
 import com.vac_controll.repository.GestorRepository;
 import com.vac_controll.repository.LoteRepository;
 import com.vac_controll.repository.VacinaRepository;
-
-import com.vac_controll.model.Constante;
 
 public class FireRules implements Runnable {
 
@@ -45,12 +36,6 @@ public class FireRules implements Runnable {
 		this.loteRepository = loteRepository;
 	}
 
-	@GetMapping
-	public Iterable<Vacina> list() {
-
-		return vacRepository.findAll();
-	}
-
 	public void run() {
 		//KieSession kSession = Constante.kSession;
 		
@@ -62,7 +47,7 @@ public class FireRules implements Runnable {
 		HashMap<Long, FactHandle> camaras_fact = new HashMap<Long, FactHandle>();
 		HashMap<Long, FactHandle> gestores_fact = new HashMap<Long, FactHandle>();
 		HashMap<Long, FactHandle> lotes_fact = new HashMap<Long, FactHandle>();
-
+		
 		while (true) {
 			try {
 				// ATUALIZANDO WORKMEMORY DE VACINAS
@@ -110,9 +95,10 @@ public class FireRules implements Runnable {
 					}
 				}
 
-				//Lote lote = (Lote) kSession.getObject(lotes_fact.get(Long.valueOf(1)));
-				//System.out.println(lote);
-				kSession.fireAllRules();
+
+				int n = kSession.fireAllRules();
+				System.out.println(n);
+				
 				Thread.sleep(1000);
 			} catch (Exception e) {
 				// TODO: handle exception

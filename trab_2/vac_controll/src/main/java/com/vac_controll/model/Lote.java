@@ -45,9 +45,6 @@ public class Lote {
 	
 	@Column(nullable = false)
 	private boolean util;
-
-	
-	public static Lote NOT_FOUND = new Lote();
 	
 	public Lote(int qtd, Vacina vacina, LocalDate validade) {
 		super();
@@ -134,7 +131,6 @@ public class Lote {
 	}
 
 	public CodigoAlerta checarTempLimiar() {
-		System.out.println("checarTempLimiar");
 		if(this.vacina.getTempMax() >= this.camara.getTemperatura() && (this.vacina.getTempMax()-this.vacina.getTemp_margem()) <= this.camara.getTemperatura()) {
 			return CodigoAlerta.MARGEM_MAX;
 		} else if (this.vacina.getTempMin() <= this.camara.getTemperatura() && (this.vacina.getTempMin()+this.vacina.getTemp_margem()) >= this.camara.getTemperatura()) {
@@ -146,7 +142,6 @@ public class Lote {
 	
 
 	public CodigoAlerta checarTempRuim() {
-		System.out.println("checarTempRuim");
 		if(this.vacina.getTempMax() <= this.camara.getTemperatura()) {
 			return CodigoAlerta.TEMP_MAX;
 		} else if (this.vacina.getTempMin() >= this.camara.getTemperatura()) {
