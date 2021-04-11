@@ -12,9 +12,6 @@ import javax.persistence.OneToOne;
 @Entity
 public class Camara {
 	
-	//@Autowired
-	//private GestorRepository gestorRepository;
-	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false)

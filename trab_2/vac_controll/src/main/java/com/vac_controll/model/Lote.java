@@ -12,40 +12,36 @@ import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.rule.FactHandle;
 
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
 
 @Entity
 public class Lote {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@Column(nullable = false)
 	private int qtd;
-	
-    @ManyToOne
-    @JoinColumn(name="camara_id")
+
+	@ManyToOne
+	@JoinColumn(name = "camara_id")
 	private Camara camara;
-	
-    @ManyToOne()
-    @JoinColumn(name = "vacina_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIdentityReference(alwaysAsId = true)
+
+	@ManyToOne()
+	@JoinColumn(name = "vacina_id")
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@JsonIdentityReference(alwaysAsId = true)
 	private Vacina vacina;
-	
+
 	@Column(nullable = false)
 	private LocalDate validade;
-	
+
 	@Column(nullable = false)
 	private boolean util;
-	
+
 	public Lote(int qtd, Vacina vacina, LocalDate validade) {
 		super();
 		this.qtd = qtd;
@@ -54,9 +50,9 @@ public class Lote {
 		this.util = true;
 	}
 
-    public Lote() {
-    }
-	
+	public Lote() {
+	}
+
 	public int getQtd() {
 		return qtd;
 	}
@@ -64,7 +60,7 @@ public class Lote {
 	public void setQtd(int qtd) {
 		this.qtd = qtd;
 	}
-	
+
 	public Camara getCamara() {
 		return camara;
 	}
@@ -96,7 +92,7 @@ public class Lote {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
 	public Vacina getVacina() {
 		return vacina;
 	}
@@ -130,22 +126,17 @@ public class Lote {
 		return true;
 	}
 
-	public CodigoAlerta checarTempLimiar() {
-		if(this.vacina.getTempMax() >= this.camara.getTemperatura() && (this.vacina.getTempMax()-this.vacina.getTemp_margem()) <= this.camara.getTemperatura()) {
-			return CodigoAlerta.MARGEM_MAX;
-		} else if (this.vacina.getTempMin() <= this.camara.getTemperatura() && (this.vacina.getTempMin()+this.vacina.getTemp_margem()) >= this.camara.getTemperatura()) {
-			return CodigoAlerta.MARGEM_MIN;
-		} else {
-			return CodigoAlerta.TEMP_OK;
-		}
-	}
-	
-
-	public CodigoAlerta checarTempRuim() {
-		if(this.vacina.getTempMax() <= this.camara.getTemperatura()) {
+	public CodigoAlerta checarTemp() {
+		if (this.vacina.getTempMax() <= this.camara.getTemperatura()) {
 			return CodigoAlerta.TEMP_MAX;
 		} else if (this.vacina.getTempMin() >= this.camara.getTemperatura()) {
 			return CodigoAlerta.TEMP_MIN;
+		} else if (this.vacina.getTempMax() >= this.camara.getTemperatura()
+				&& (this.vacina.getTempMax() - this.vacina.getTemp_margem()) <= this.camara.getTemperatura()) {
+			return CodigoAlerta.MARGEM_MAX;
+		} else if (this.vacina.getTempMin() <= this.camara.getTemperatura()
+				&& (this.vacina.getTempMin() + this.vacina.getTemp_margem()) >= this.camara.getTemperatura()) {
+			return CodigoAlerta.MARGEM_MIN;
 		} else {
 			return CodigoAlerta.TEMP_OK;
 		}

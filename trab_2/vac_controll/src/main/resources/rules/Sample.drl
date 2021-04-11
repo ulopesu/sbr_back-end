@@ -3,10 +3,8 @@ package com.vac_controll.model;
 import java.util.Date;
 import java.util.ArrayList;
 
-import com.vac_controll.controller.LoteController
-
-function long currentTime(){
-  return System.currentTimeMillis();
+function long tempoAtual(){
+return System.currentTimeMillis();
 }
 
 //TODO:
@@ -29,109 +27,66 @@ Sugestões de roteiro para apresentações (com uso de slides) – 30 minutos ca
 - Demonstração da ferramenta...
 */
 
-declare TempRuimMax
-	lote: Lote;
-	temp: double;
-	inicio: Date;
-	fim: Date;
-	valido: boolean;
-end
 
-declare TempRuimMin
-	lote: Lote;
-	temp: double;
-	inicio: Date;
-	fim: Date;
-	valido: boolean;
-end
-
-declare descarte
-	lote: Lote;
-end
-
-
-
-rule "Lote Temp Limiar Negativo"
+// TEMPERATURA PERIGOSA - SEM REGISTRO
+rule "Lote Temp Perigosa"
     when
-    	$lote: Lote(checarTempLimiar==CodigoAlerta.MARGEM_MIN, $util:util==true)
+    	$lote: Lote($codigoLote: checarTemp!=CodigoAlerta.TEMP_OK, $cam:camara, $util:util==true)
+		Camara(this==$cam, $temp:temperatura)
+		not (exists (TempRuim(lote == $lote, fim==null)))
     then
-end
-
-rule "Lote Temp Limiar Positivo"
-    when
-    	$lote: Lote(checarTempLimiar==CodigoAlerta.MARGEM_MAX, util==true)
-    then
+		insert(new TempRuim($lote, $temp, new Date(), $codigoLote));
+		//System.out.println("Temp Perigosa");
 end
 
 
-rule "Lote Temp Ruim Negativo"
+rule "Lote Temp Diferente"
     when
-    	$lote: Lote(checarTempRuim==CodigoAlerta.TEMP_MIN, $cam:camara, util==true)
-    	Camara(this==$cam, $temp:temperatura)
-    	not (exists (TempRuimMin(lote==$lote, valido==true)))
-    then
-    	insert (new TempRuimMin($lote, $temp, new Date(), null, true)); 
-end
-
-
-rule "Lote Temp Ruim Positivo"
-    when
-    	$lote: Lote(checarTempRuim==CodigoAlerta.TEMP_MAX, $cam:camara, util==true)
-    	Camara(this==$cam, $temp:temperatura)
-    	not (exists (TempRuimMax(lote==$lote, valido==true)))
-    then
-    	insert (new TempRuimMax($lote, $temp, new Date(), null, true));
-end
-
-
-rule "Lote Temp Dif Min"
-    when
-    	$lote: Lote(checarTempRuim != CodigoAlerta.TEMP_MIN, util==true)
-    	$tempRuim: TempRuimMin(lote==$lote, valido==true)
+    	$lote: Lote($codigoLote:checarTemp, $cam:camara, $util:util)
+		Camara(this==$cam, $temp:temperatura)
+		$tempRuim: TempRuim(lote == $lote, fim==null, codigo != $codigoLote)
     then
 		$tempRuim.setFim(new Date());
-		$tempRuim.setValido(false);
+		$tempRuim.setFoiAlterada(true);
 		update($tempRuim);
+		if($codigoLote != CodigoAlerta.TEMP_OK && $util==true){
+			insert(new TempRuim($lote, $temp, new Date(), $codigoLote));
+		}
+		//System.out.println("Temp Diferente");
 end
 
 
-rule "Lote Temp Dif Max"
-    when
-    	$lote: Lote(checarTempRuim != CodigoAlerta.TEMP_MAX, util==true)
-    	$tempRuim: TempRuimMax(lote==$lote, valido==true)
-    then
-		$tempRuim.setFim(new Date());
-		$tempRuim.setValido(false);
-		update($tempRuim);
-end
-
-
+// DESCARTE DO LOTE DE VACINAS
 rule "Descarte TempMin"
 	when
 		$lote: Lote($cam:camara, $vac:vacina, util==true)
-		Camara(this==$cam, $temp:temperatura)
-		TempRuimMin(lote == $lote, $inicioTime: inicio.getTime(), valido==true)
-		eval((currentTime()-$inicioTime) > Constante.LimiteExposicao)
+		TempRuim(lote == $lote, $inicioTime: inicio.getTime(), fim==null, codigo==CodigoAlerta.TEMP_MIN)
+		eval((tempoAtual()-$inicioTime) > Constante.LimiteExposicao)
+		not (exists (Descarte(lote==$lote)))
 	then
-		insertLogical(new descarte($lote));
-		$lote.setUtil(false);
-		update($lote);
+		insert(new Descarte(new Date(), $lote, CodigoAlerta.DESCARTE));
+		//System.out.println("Descarte TempMin");
 end
 
 
 rule "Descarte TempMax"
 	when
 		$lote: Lote($cam:camara, $vac:vacina, util==true)
-		TempRuimMax(lote == $lote, $inicioTime: inicio.getTime(), valido==true)
-		eval((currentTime()-$inicioTime) > Constante.LimiteExposicao)
-		Camara(this==$cam, $temp:temperatura)
+		TempRuim(lote == $lote, $inicioTime: inicio.getTime(), fim==null, codigo==CodigoAlerta.TEMP_MAX)
+		eval((tempoAtual()-$inicioTime) > Constante.LimiteExposicao)
+		not (exists (Descarte(lote==$lote)))
 	then
-		insertLogical(new descarte($lote));
-		$lote.setUtil(false);
-		update($lote);
+		insert(new Descarte(new Date(), $lote, CodigoAlerta.DESCARTE));
+		//System.out.println("Descarte TempMax");
 end
 
 
+// CONSULTAS (QUERIES)
+query "novasTempRuim"
+	tempRuim: TempRuim(foiAlterada)
+end
 
-
+query "novosDescartes"
+	descarte: Descarte(id==null)
+end
 

@@ -1,20 +1,10 @@
 package com.vac_controll.model;
 
-import java.util.List;
-import java.util.Optional;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
-import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.rule.FactHandle;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 @Entity
 public class Vacina {

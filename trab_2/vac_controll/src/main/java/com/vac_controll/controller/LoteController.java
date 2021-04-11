@@ -1,9 +1,7 @@
 package com.vac_controll.controller;
 
-import java.util.List;
 import java.util.Optional;
 
-import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,16 +15,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vac_controll.model.Camara;
-import com.vac_controll.model.CodigoAlerta;
-import com.vac_controll.model.Constante;
 import com.vac_controll.model.FireRules;
-import com.vac_controll.model.Gestor;
 import com.vac_controll.model.Lote;
 import com.vac_controll.model.Vacina;
 import com.vac_controll.repository.CamaraRepository;
+import com.vac_controll.repository.DescarteRepository;
 import com.vac_controll.repository.GestorRepository;
 import com.vac_controll.repository.LoteRepository;
-
+import com.vac_controll.repository.TempRuimRepository;
 import com.vac_controll.repository.VacinaRepository;
 
 @RestController
@@ -44,7 +40,14 @@ public class LoteController {
 
 	@Autowired
 	private GestorRepository gestorRepository;
-
+	
+	@Autowired
+	private TempRuimRepository tempRuimRepository;
+	
+	@Autowired
+	private DescarteRepository descarteRepository;
+	
+	
 	@GetMapping
 	public Iterable<Lote> list() {
 		return loteRepository.findAll();
@@ -78,7 +81,9 @@ public class LoteController {
 						vacRepository, 
 						camRepository, 
 						gestorRepository, 
-						loteRepository
+						loteRepository,
+						tempRuimRepository,
+						descarteRepository
 						)
 				);
 			t1.start();
@@ -123,18 +128,5 @@ public class LoteController {
 			loteRepository.deleteById(id);
 			return ResponseEntity.ok().build();
 		}).orElse(ResponseEntity.notFound().build());
-	}
-
-	public void notificarGestores(CodigoAlerta cod, Lote lote) {
-		List<Gestor> gestores = gestorRepository.findByCamaraId(lote.getCamara().getId());
-		for (Gestor gestor : gestores) {
-			gestor.enviarMsg(lote, cod);
-		}
-	}
-
-	public void chamarGestor(CodigoAlerta cod, Lote lote) {
-		List<Gestor> gestores = gestorRepository.findByCamaraId(lote.getCamara().getId());
-		Gestor gMaisProx = lote.getCamara().getLoc().gestorMaisProx(gestores);
-		gMaisProx.enviarMsg(lote, cod);
 	}
 }

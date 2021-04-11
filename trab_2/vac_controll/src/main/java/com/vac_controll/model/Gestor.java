@@ -9,13 +9,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.rule.FactHandle;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
-
 @Entity
 public class Gestor {
 	@Id
@@ -36,12 +29,12 @@ public class Gestor {
 	@Column(nullable = false)
 	private String telefone;
 
-    @OneToOne
-    @JoinColumn(name = "loc_id")
+	@OneToOne
+	@JoinColumn(name = "loc_id")
 	private Localizacao loc;
-    
-    public static Gestor NOT_FOUND = new Gestor();
-	
+
+	public static Gestor NOT_FOUND = new Gestor();
+
 	public Gestor(String nome, String email, String telefone, Localizacao loc) {
 		super();
 		this.nome = nome;
@@ -49,10 +42,10 @@ public class Gestor {
 		this.telefone = telefone;
 		this.loc = loc;
 	}
-	
-    public Gestor() {
-    }
-		
+
+	public Gestor() {
+	}
+
 	public String getNome() {
 		return nome;
 	}
@@ -126,43 +119,45 @@ public class Gestor {
 		return true;
 	}
 
-	public void enviarMsg(Lote lote, CodigoAlerta cod) {
+	private String mensagem(Lote lote, CodigoAlerta cod, boolean ehMaixProx) {
+		String msg = null;
 		switch (cod) {
 		case MARGEM_MIN:
-			System.out.println("\nALERTA -> Temperatura da Camara(" + lote.getCamara().getNome()
-					+ ") está próxima do limite negativo.\n");
+			msg = "\nALERTA -> Temperatura da " + lote.getCamara().getNome()
+					+ " está próxima do limite mínimo.\n";
 			break;
 
 		case MARGEM_MAX:
-			System.out.println("\nALERTA -> Temperatura da Camara(" + lote.getCamara().getNome()
-					+ ") está próxima do limite positivo.\n");
+			msg = "\nALERTA -> Temperatura da " + lote.getCamara().getNome()
+					+ " está próxima do limite máximo.\n";
 			break;
 
 		case TEMP_MIN:
-			System.out.println("\nALERTA -> Temperatura da Camara(" + lote.getCamara().getNome()
-					+ ") ultrapassou limite negativo. " + this.nome + " dirija-se ao local.\n");
+			msg = "\nALERTA -> Temperatura da " + lote.getCamara().getNome()
+					+ " ultrapassou limite mínimo.\n";
 			break;
 
 		case TEMP_MAX:
-			System.out.println("\nALERTA -> Temperatura da Camara(" + lote.getCamara().getNome()
-					+ ") ultrapassou limite positivo. " + this.nome + " dirija-se ao local.\n");
+			msg = "\nALERTA -> Temperatura da " + lote.getCamara().getNome()
+					+ " ultrapassou limite máximo.\n";
 			break;
 
-		case DESCARTE_MIN:
-			System.out.println("\n" + this.nome + ",\n" + "ALERTA -> Descarte na Camara(" + lote.getCamara().getNome()
-					+ "):\n" + "Vacina: " + lote.getVacina().getNome() + "\nValidade: " + lote.getValidade()
-					+ "\nQuantidade: " + lote.getQtd() + ".\n");
-			break;
-
-		case DESCARTE_MAX:
-			System.out.println("\n" + this.nome + ",\n" + "ALERTA -> Descarte na Camara(" + lote.getCamara().getNome()
-					+ "):\n" + "Vacina: " + lote.getVacina().getNome() + ".\nValidade: " + lote.getValidade()
-					+ ".\nQuantidade: " + lote.getQtd() + ".\n");
+		case DESCARTE:
+			msg = "\n" + "ALERTA -> Descarte na " + lote.getCamara().getNome() + ":\n"
+					+ "Vacina: " + lote.getVacina().getNome() + "\nValidade: " + lote.getValidade() + "\nQuantidade: "
+					+ lote.getQtd() + ".\n";
 			break;
 		default:
-			// code block
 		}
 
+		if (ehMaixProx && cod!=CodigoAlerta.DESCARTE) {
+			msg += this.nome +", você é o gestor mais próximo, dirija-se ao local!!!\n";
+		}
+		return msg;
+	}
+
+	public void enviarMsg(Lote lote, CodigoAlerta cod, boolean ehMaixProx) {
+		System.out.println(this.mensagem(lote, cod, ehMaixProx));
 	}
 
 }
