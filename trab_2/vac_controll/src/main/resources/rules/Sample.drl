@@ -39,7 +39,7 @@ rule "Lote Temp Perigosa"
 		//System.out.println("Temp Perigosa");
 end
 
-
+// MUDANCA DE ESTADO
 rule "Lote Temp Diferente"
     when
     	$lote: Lote($codigoLote:checarTemp, $cam:camara, $util:util)
@@ -57,29 +57,15 @@ end
 
 
 // DESCARTE DO LOTE DE VACINAS
-rule "Descarte TempMin"
+rule "Descarte"
 	when
 		$lote: Lote($cam:camara, $vac:vacina, util==true)
-		TempRuim(lote == $lote, $inicioTime: inicio.getTime(), fim==null, codigo==CodigoAlerta.TEMP_MIN)
+		TempRuim(lote == $lote, $inicioTime: inicio.getTime(), fim==null, $codigoTempRuim: codigo == CodigoAlerta.TEMP_MIN || ==CodigoAlerta.TEMP_MAX)
 		eval((tempoAtual()-$inicioTime) > Constante.LimiteExposicao)
 		not (exists (Descarte(lote==$lote)))
 	then
-		insert(new Descarte(new Date(), $lote, CodigoAlerta.DESCARTE));
-		//System.out.println("Descarte TempMin");
+		insert(new Descarte(new Date(), $lote, $codigoTempRuim));
 end
-
-
-rule "Descarte TempMax"
-	when
-		$lote: Lote($cam:camara, $vac:vacina, util==true)
-		TempRuim(lote == $lote, $inicioTime: inicio.getTime(), fim==null, codigo==CodigoAlerta.TEMP_MAX)
-		eval((tempoAtual()-$inicioTime) > Constante.LimiteExposicao)
-		not (exists (Descarte(lote==$lote)))
-	then
-		insert(new Descarte(new Date(), $lote, CodigoAlerta.DESCARTE));
-		//System.out.println("Descarte TempMax");
-end
-
 
 // CONSULTAS (QUERIES)
 query "novasTempRuim"

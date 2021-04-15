@@ -22,14 +22,18 @@ Content-Type: application/json
 ###
 
 #   CREATE
+
+#   LOCALIZAÇÕES
+#   UFES: -20.273610030740326, -40.30586659439299
+
 POST {{ URL_API }}/camara/
 Content-Type: application/json
 
 {
     "nome": "Camara 1 - Cariacica",
     "loc": {
-        "longitude": -40.377734714473526,
-        "latitude": -20.33262247031378
+        "latitude": -20.273610030740326,
+        "longitude": -40.30586659439299
     },
     "temperatura": 16.0,
     "umidade": 80.0
@@ -37,12 +41,13 @@ Content-Type: application/json
 ###
 
 
+
 #   UPDATE
 PUT {{ URL_API }}/camara/1
 Content-Type: application/json
 
 {
-    "temperatura": 10,
+    "temperatura": 4,
     "umidade": 80.0
 }
 ###

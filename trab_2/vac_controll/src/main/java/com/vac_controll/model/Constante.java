@@ -1,5 +1,5 @@
 package com.vac_controll.model;
 
 public class Constante {
-	public static final int LimiteExposicao = 3000;
+	public static final int LimiteExposicao = 10000;
 }

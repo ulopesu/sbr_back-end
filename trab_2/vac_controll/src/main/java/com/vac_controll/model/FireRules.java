@@ -51,8 +51,6 @@ public class FireRules implements Runnable {
 	}
 
 	public void run() {
-		// KieSession kSession = Constante.kSession;
-
 		KieServices ks = KieServices.Factory.get();
 		KieContainer kContainer = ks.getKieClasspathContainer();
 		KieSession kSession = kContainer.newKieSession("ksession-rules");
@@ -119,7 +117,7 @@ public class FireRules implements Runnable {
 				for (QueryResultsRow row : results) {
 					Descarte descarte = (Descarte) row.get("descarte");
 					Lote lote = descarte.getLote();
-					notificarGestores(descarte.getCodigo(), lote);
+					notificarGestores(CodigoAlerta.DESCARTE, lote);
 
 					FactHandle fact = kSession.getFactHandle(descarte);
 					descarte = (Descarte) descarteRepository.save(descarte);
