@@ -25,10 +25,10 @@ POST {{ URL_API }}/vacina/
 Content-Type: application/json
 
 {
-    "nome": "corona vac",
+    "nome": "corona vac 2",
     "tempMax": 15.0,
     "tempMin": 5.0,
-    "margem": 10
+    "margem": 20
 }
 ###
 

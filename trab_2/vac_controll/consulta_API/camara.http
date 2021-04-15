@@ -28,8 +28,8 @@ Content-Type: application/json
 {
     "nome": "Camara 1 - Cariacica",
     "loc": {
-        "latitude": -20.33262247031378,
-        "longitude": -40.377734714473526
+        "longitude": -40.377734714473526,
+        "latitude": -20.33262247031378
     },
     "temperatura": 16.0,
     "umidade": 80.0
@@ -42,12 +42,7 @@ PUT {{ URL_API }}/camara/1
 Content-Type: application/json
 
 {
-    "nome": "Camara de Vitoria",
-    "loc": {
-        "latitude": -20.33262247031378,
-        "longitude": -40.377734714473526
-    },
-    "temperatura": 14.0,
+    "temperatura": 10,
     "umidade": 80.0
 }
 ###

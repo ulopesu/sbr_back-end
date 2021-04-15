@@ -27,7 +27,7 @@ Content-Type: application/json
 {
     "qtd": 3,
     "vacina": {
-        "id": 1
+        "id": 2
     },
     "camara": {
         "id": 1

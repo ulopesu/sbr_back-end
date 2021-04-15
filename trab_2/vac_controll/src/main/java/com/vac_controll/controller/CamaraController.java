@@ -58,12 +58,18 @@ public class CamaraController {
 	public ResponseEntity<Camara> update(@PathVariable("id") long id, @RequestBody Camara cam) {
 		return camRepository.findById(id)
 			.map(record -> {
-				record.setNome(cam.getNome());
+				if(cam.getNome()!=null) {
+					record.setNome(cam.getNome());
+				}
+				
 				if (cam.getLoc()!=null) {
 					record.setLoc(locRepository.save(cam.getLoc()));
 				}
+
 				record.setTemperatura(cam.getTemperatura());
+				
 				record.setUmidade(cam.getUmidade());
+
 				Camara updated = camRepository.save(record);
 				return ResponseEntity.ok().body(updated);
 			}).orElse(ResponseEntity.notFound().build());
