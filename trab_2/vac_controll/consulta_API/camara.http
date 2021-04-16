@@ -11,26 +11,24 @@ GET {{ URL_API }}/camara/
 Content-Type: application/json
 
 {}
-
 ###
 
-#   RETRIVE
+
+#   RETRIEVE
 GET {{ URL_API }}/camara/1
 Content-Type: application/json
 
 {}
 ###
 
+
 #   CREATE
-
-#   LOCALIZAÇÕES
 #   UFES: -20.273610030740326, -40.30586659439299
-
 POST {{ URL_API }}/camara/
 Content-Type: application/json
 
 {
-    "nome": "Camara 1 - Cariacica",
+    "nome": "Camara 1 - UFES",
     "loc": {
         "latitude": -20.273610030740326,
         "longitude": -40.30586659439299
@@ -43,14 +41,21 @@ Content-Type: application/json
 
 
 #   UPDATE
+#   ESTADIO_CARIACITY:  -20.332918400404424, -40.38515350717288
 PUT {{ URL_API }}/camara/1
 Content-Type: application/json
 
-{
+{   
+    "nome": "Camara 1 - Cariacica",
+    "loc": {
+        "latitude": -20.273610030740326,
+        "longitude": -40.30586659439299
+    },
     "temperatura": 4,
     "umidade": 80.0
 }
 ###
+
 
 #   DELETE
 DELETE  {{ URL_API }}/camara/2

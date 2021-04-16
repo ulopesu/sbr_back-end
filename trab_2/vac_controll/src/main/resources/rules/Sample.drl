@@ -2,70 +2,72 @@ package com.vac_controll.model;
 
 import java.util.Date;
 import java.util.ArrayList;
+import java.time.ZoneId;
 
 function long tempoAtual(){
-return System.currentTimeMillis();
+	return System.currentTimeMillis();
 }
 
-//TODO:
-/*	
-	- COMENTAR CÓDIGO
-	- FAZER DIAGRAMA UML
-	- PREPARAR SLIDES
-*/
 
-
-
-/*
-Sugestões de roteiro para apresentações (com uso de slides) – 30 minutos cada grupo:
-
-- Apresente visão geral do sistema desenvolvido (use figuras de preferencia), tipo:
-- Visão geral das funcionalidades do sistema (o que o sistema é capaz de fazer?)
-- Modelo de classes/componentes
-
-- Como as funcionalidades citadas acima são implementadas (como o sistema é implementado em termos de regras drools, threads, sensores, etc.)
-- Demonstração da ferramenta...
-*/
-
-
-// TEMPERATURA PERIGOSA - SEM REGISTRO
-rule "Lote Temp Perigosa"
+rule "Lote com Temperatura Perigosa"
     when
-    	$lote: Lote($codigoLote: checarTemp!=CodigoAlerta.TEMP_OK, $cam:camara, $util:util==true)
+    	$lote: 
+		Lote(
+			$codigoLote: checarTemp != CodigoAlerta.TEMP_OK, 
+			$cam:camara, 
+			$util:util == true
+		)
 		Camara(this==$cam, $temp:temperatura)
-		not (exists (TempRuim(lote == $lote, fim==null)))
+		not (exists (TempRuim(lote == $lote, fim == null)))
     then
 		insert(new TempRuim($lote, $temp, new Date(), $codigoLote));
-		//System.out.println("Temp Perigosa");
 end
 
-// MUDANCA DE ESTADO
-rule "Lote Temp Diferente"
+rule "Mudança de Estado do Lote"
     when
     	$lote: Lote($codigoLote:checarTemp, $cam:camara, $util:util)
 		Camara(this==$cam, $temp:temperatura)
-		$tempRuim: TempRuim(lote == $lote, fim==null, codigo != $codigoLote)
+		$tempRuim: TempRuim(lote == $lote, fim == null, codigo != $codigoLote)
     then
 		$tempRuim.setFim(new Date());
 		$tempRuim.setFoiAlterada(true);
 		update($tempRuim);
-		if($codigoLote != CodigoAlerta.TEMP_OK && $util==true){
+		if($codigoLote != CodigoAlerta.TEMP_OK && $util == true){
 			insert(new TempRuim($lote, $temp, new Date(), $codigoLote));
 		}
-		//System.out.println("Temp Diferente");
 end
 
 
-// DESCARTE DO LOTE DE VACINAS
-rule "Descarte"
+rule "Descarte Por Temperatura"
 	when
-		$lote: Lote($cam:camara, $vac:vacina, util==true)
-		TempRuim(lote == $lote, $inicioTime: inicio.getTime(), fim==null, $codigoTempRuim: codigo == CodigoAlerta.TEMP_MIN || ==CodigoAlerta.TEMP_MAX)
+		$lote: Lote($cam:camara, $vac:vacina, util == true)
+		TempRuim(	
+			lote == $lote, 
+			$inicioTime: inicio.getTime(), 
+			fim == null, 
+			$codigoTempRuim: codigo == CodigoAlerta.TEMP_MIN || == CodigoAlerta.TEMP_MAX
+		)
 		eval((tempoAtual()-$inicioTime) > Constante.LimiteExposicao)
-		not (exists (Descarte(lote==$lote)))
+		not (exists (Descarte(lote == $lote)))
 	then
 		insert(new Descarte(new Date(), $lote, $codigoTempRuim));
 end
+
+
+rule "Descarte Por Validade"
+	when
+		$lote: Lote(
+			validade.atStartOfDay(
+				ZoneId.systemDefault()
+			).toInstant().plusMillis(
+				Constante.DiaEmMilesimos
+			).toEpochMilli() < tempoAtual()
+		)
+		not (exists (Descarte(lote == $lote)))
+	then
+		insert(new Descarte(new Date(), $lote, CodigoAlerta.VALIDADE));
+end
+
 
 // CONSULTAS (QUERIES)
 query "novasTempRuim"
@@ -73,6 +75,5 @@ query "novasTempRuim"
 end
 
 query "novosDescartes"
-	descarte: Descarte(id==null)
+	descarte: Descarte(id == null)
 end
-

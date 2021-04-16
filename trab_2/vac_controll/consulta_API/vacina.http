@@ -13,12 +13,14 @@ Content-Type: application/json
 {}
 ###
 
-#   RETRIVE
+
+#   RETRIEVE
 GET {{ URL_API }}/vacina/1
 Content-Type: application/json
 
 {}
 ###
+
 
 #   CREATE
 POST {{ URL_API }}/vacina/

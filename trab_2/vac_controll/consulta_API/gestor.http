@@ -14,7 +14,7 @@ Content-Type: application/json
 
 ###
 
-#   RETRIVE
+#   RETRIEVE
 GET {{ URL_API }}/gestor/1
 Content-Type: application/json
 
@@ -22,7 +22,6 @@ Content-Type: application/json
 ###
 
 #   CREATE
-
 #   SHOP_VIX:           -20.312728328794147, -40.2880710598846
 POST {{ URL_API }}/gestor/
 Content-Type: application/json
@@ -64,8 +63,8 @@ PUT {{ URL_API }}/gestor/2
 Content-Type: application/json
 
 {
-    "nome": "Bel",
-    "email": "bel@ufes.br",
+    "nome": "Patricia",
+    "email": "pat@ufes.br",
     "telefone": "(27) 98888-8888",
     "loc": {
         "latitude": -20.33262247031378,
@@ -76,7 +75,7 @@ Content-Type: application/json
 ###
 
 #   DELETE
-DELETE  {{ URL_API }}/gestor/2
+DELETE  {{ URL_API }}/gestor/1
 Content-Type: application/json
 
 {}

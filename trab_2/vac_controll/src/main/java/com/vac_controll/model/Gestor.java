@@ -144,12 +144,11 @@ public class Gestor {
 
 		case DESCARTE:
 			msg = "\n" + "ALERTA -> Descarte na " + lote.getCamara().getNome() + ":\n"
-					+ "Vacina: " + lote.getVacina().getNome() + "\nValidade: " + lote.getValidade() + "\nQuantidade: "
-					+ lote.getQtd() + ".\n";
+					+ "Vacina: " + lote.getVacina().getNome() + "\nValidade: " 
+					+ lote.getValidade() + "\nQuantidade: " + lote.getQtd() + ".\n";
 			break;
 		default:
 		}
-
 		if (ehMaixProx && cod!=CodigoAlerta.DESCARTE) {
 			msg += this.nome +", você é o gestor mais próximo, dirija-se ao local!!!\n";
 		}
