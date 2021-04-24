@@ -25,64 +25,64 @@ function CodigoAlerta checarTempDRL(Vacina vacina, Double tempCamara) {
 }
 
 
-rule "Lote com Temperatura Perigosa"
-    when
-    	$lote: Lote(
-			$tempCam:camara.getTemperatura(), 
-			$util:util == true, 
-			$codigoLote:checarTempDRL(vacina, camara.getTemperatura()) != CodigoAlerta.TEMP_OK
-		)
-		not (exists (TempRuim(lote == $lote, fim == null)))
-    then
-		insert(new TempRuim($lote, $tempCam, new Date(), $codigoLote));
-end
-
-
-rule "Mudança de Estado do Lote"
-    when
-    	$lote: Lote(
-			$tempCam:camara.getTemperatura(), 
-			$vac:vacina,
-			$codigoLote:checarTempDRL(vacina, camara.getTemperatura()),
-			$util:util
-		)
-		$tempRuim: TempRuim(lote == $lote, fim == null, codigo != $codigoLote)
-    then
-		$tempRuim.setFim(new Date());
-		$tempRuim.setFoiAlterada(true);
-		update($tempRuim);
-		if($codigoLote != CodigoAlerta.TEMP_OK && $util == true){
-			insert(new TempRuim($lote, $tempCam, new Date(), $codigoLote));
-		}
-end
-
 //rule "Lote com Temperatura Perigosa"
 //    when
-//    	$lote: 
-//		Lote(
-//			$codigoLote: checarTemp != CodigoAlerta.TEMP_OK, 
-//			$cam:camara, 
-//			$util:util == true
+//    	$lote: Lote(
+//			$tempCam:camara.getTemperatura(), 
+//			$util:util == true, 
+//			$codigoLote:checarTempDRL(vacina, camara.getTemperatura()) != CodigoAlerta.TEMP_OK
 //		)
-//		Camara(this==$cam, $temp:temperatura)
 //		not (exists (TempRuim(lote == $lote, fim == null)))
 //    then
-//		insert(new TempRuim($lote, $temp, new Date(), $codigoLote));
+//		insert(new TempRuim($lote, $tempCam, new Date(), $codigoLote));
 //end
+//
 //
 //rule "Mudança de Estado do Lote"
 //    when
-//    	$lote: Lote($codigoLote:checarTemp, $cam:camara, $util:util)
-//		Camara(this==$cam, $temp:temperatura)
+//    	$lote: Lote(
+//			$tempCam:camara.getTemperatura(), 
+//			$vac:vacina,
+//			$codigoLote:checarTempDRL(vacina, camara.getTemperatura()),
+//			$util:util
+//		)
 //		$tempRuim: TempRuim(lote == $lote, fim == null, codigo != $codigoLote)
 //    then
 //		$tempRuim.setFim(new Date());
 //		$tempRuim.setFoiAlterada(true);
 //		update($tempRuim);
 //		if($codigoLote != CodigoAlerta.TEMP_OK && $util == true){
-//			insert(new TempRuim($lote, $temp, new Date(), $codigoLote));
+//			insert(new TempRuim($lote, $tempCam, new Date(), $codigoLote));
 //		}
 //end
+
+rule "Lote com Temperatura Perigosa"
+    when
+    	$lote: 
+		Lote(
+			$codigoLote: checarTemp != CodigoAlerta.TEMP_OK, 
+			$cam:camara, 
+			$util:util == true
+		)
+		Camara(this==$cam, $temp:temperatura)
+		not (exists (TempRuim(lote == $lote, fim == null)))
+    then
+		insert(new TempRuim($lote, $temp, new Date(), $codigoLote));
+end
+
+rule "Mudança de Estado do Lote"
+    when
+    	$lote: Lote($codigoLote:checarTemp, $cam:camara, $util:util)
+		Camara(this==$cam, $temp:temperatura)
+		$tempRuim: TempRuim(lote == $lote, fim == null, codigo != $codigoLote)
+    then
+		$tempRuim.setFim(new Date());
+		$tempRuim.setFoiAlterada(true);
+		update($tempRuim);
+		if($codigoLote != CodigoAlerta.TEMP_OK && $util == true){
+			insert(new TempRuim($lote, $temp, new Date(), $codigoLote));
+		}
+end
 
 
 rule "Descarte Por Temperatura"
@@ -114,15 +114,6 @@ rule "Descarte Por Validade"
 	then
 		insert(new Descarte(new Date(), $lote, CodigoAlerta.VALIDADE));
 end
-
-
-//rule "Camara com Defeito"
-//when
-//	$tempRuim: TempRuim(lote == $lote, fim == null, codigo != $codigoLote)
-//	Number(intValue>=10) from accumulate(
-//		
-//	)
-
 
 
 // CONSULTAS (QUERIES)

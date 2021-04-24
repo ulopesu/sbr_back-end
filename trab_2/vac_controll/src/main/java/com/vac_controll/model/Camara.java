@@ -19,7 +19,7 @@ public class Camara {
 	
 	@Column(nullable = false)
 	private String nome;
-	
+
     @OneToOne
     @JoinColumn(name = "loc_id")
 	private Localizacao loc;

@@ -74,6 +74,8 @@ public class LoteController {
 				lote.setCamara(my_cam);
 			});
 		}
+		
+		lote.setUtil(true);
 
 		if (loteRepository.count() == 0) {
 			Thread t1 = new Thread(
