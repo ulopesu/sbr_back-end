@@ -27,12 +27,15 @@ public class Camara {
 	@Column(nullable = false)
 	private double temperatura;
 
-	
+	@Column(nullable = true)
+	private String tempcor;
+
 	public Camara(String nome, Localizacao loc, double temperatura) {
 		super();
 		this.nome = nome;
 		this.loc = loc;
 		this.temperatura = temperatura;
+		this.tempcor = Constante.TEMP_COR_OK;
 	}
 
     public Camara() {
@@ -62,6 +65,18 @@ public class Camara {
 	public void setTemperatura(double temperatura) {
 		System.out.println("Nova temp: " + temperatura);
 		this.temperatura = temperatura;
+
+		if(temperatura<=5){
+			this.tempcor = Constante.TEMP_COR_MIN;
+		} else if (temperatura<=9) {
+			this.tempcor = Constante.TEMP_COR_MARGEM_MIN;
+		} else if (temperatura<=15) {
+			this.tempcor = Constante.TEMP_COR_OK;
+		} else if (temperatura<=20){
+			this.tempcor = Constante.TEMP_COR_MARGEM_MAX;
+		} else {
+			this.tempcor = Constante.TEMP_COR_MAX;
+		}
 	}
 
 	public Long getId() {
@@ -71,7 +86,16 @@ public class Camara {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
+	public String getTempcor() {
+		return this.tempcor;
+	}
+
+	public void setTempcor(String tempcor) {
+		this.tempcor = tempcor;
+	}	
+
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
