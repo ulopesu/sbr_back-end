@@ -34,7 +34,7 @@ Content-Type: application/json
     "camara": {
         "id": 1
     },
-    "validade": "2021-04-15",
+    "validade": "2021-04-23",
     "util": true
 }
 ###

@@ -147,7 +147,6 @@ public class FireRules implements Runnable {
 						tempRuim = (TempRuim) tempRuimRepository.save(tempRuim);
 						kSession.update(temp_ruim_fact.get(tempRuim.getId()), tempRuim);
 					}
-
 				}
 
 				kSession.fireAllRules();

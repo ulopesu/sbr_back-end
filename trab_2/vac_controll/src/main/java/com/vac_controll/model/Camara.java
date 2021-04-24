@@ -26,16 +26,13 @@ public class Camara {
 	
 	@Column(nullable = false)
 	private double temperatura;
+
 	
-	@Column(nullable = false)
-	private double umidade;
-	
-	public Camara(String nome, Localizacao loc, double temperatura, double umidade) {
+	public Camara(String nome, Localizacao loc, double temperatura) {
 		super();
 		this.nome = nome;
 		this.loc = loc;
 		this.temperatura = temperatura;
-		this.umidade = umidade;
 	}
 
     public Camara() {
@@ -65,14 +62,6 @@ public class Camara {
 	public void setTemperatura(double temperatura) {
 		System.out.println("Nova temp: " + temperatura);
 		this.temperatura = temperatura;
-	}
-	
-	public double getUmidade() {
-		return umidade;
-	}
-
-	public void setUmidade(double umidade) {
-		this.umidade = umidade;
 	}
 
 	public Long getId() {
