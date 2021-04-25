@@ -1,9 +1,11 @@
 package com.vac_controll.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,11 +55,16 @@ public class LoteController {
 		return loteRepository.findAll();
 	}
 
+	@CrossOrigin("*")
+	@GetMapping(value="/camara/{camara_id}")
+	public List<Lote> list(@PathVariable("camara_id") long id) {
+		return loteRepository.findByCamaraId(id);
+	}
+
 	@PostMapping
 	@ResponseStatus
 	public Lote create(@RequestBody Lote lote) {
 		// SET VACINA BY ID
-
 		if (lote.getVacina() != null) {
 			Long vac_id = lote.getVacina().getId();
 			Optional<Vacina> vac = vacRepository.findById(vac_id);
@@ -90,6 +97,7 @@ public class LoteController {
 				);
 			t1.start();
 		}
+		lote.atualizarCam();
 		return loteRepository.save(lote);
 	}
 

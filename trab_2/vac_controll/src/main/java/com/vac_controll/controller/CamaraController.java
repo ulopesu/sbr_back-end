@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vac_controll.model.Camara;
-import com.vac_controll.model.Constante;
+import com.vac_controll.model.CodigoAlerta;
 import com.vac_controll.model.HistoricoCamara;
 import com.vac_controll.repository.CamaraRepository;
 import com.vac_controll.repository.HistoricoCamaraRepository;
@@ -49,7 +49,7 @@ public class CamaraController {
 			cam.setLoc(locRepository.save(cam.getLoc()));
 		}
 
-		cam.setTempcor(Constante.TEMP_COR_OK);
+		cam.setCodigo(CodigoAlerta.TEMP_OK);
 
 		Camara new_cam = camRepository.save(cam);
 
@@ -75,9 +75,7 @@ public class CamaraController {
 			if (cam.getLoc() != null) {
 				record.setLoc(locRepository.save(cam.getLoc()));
 			}
-
 			double temp = cam.getTemperatura();
-
 			record.setTemperatura(temp);
 
 			Camara updated = camRepository.save(record);

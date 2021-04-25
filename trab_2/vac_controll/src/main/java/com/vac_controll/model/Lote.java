@@ -15,7 +15,6 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 
-
 @Entity
 public class Lote {
 
@@ -42,6 +41,9 @@ public class Lote {
 	@Column(nullable = false)
 	private boolean util;
 
+	@Column(nullable = true)
+	public CodigoAlerta codigo;
+
 	public Lote(int qtd, Vacina vacina, LocalDate validade) {
 		super();
 		this.qtd = qtd;
@@ -67,6 +69,7 @@ public class Lote {
 
 	public void setCamara(Camara camara) {
 		this.camara = camara;
+		this.checarTemp();
 	}
 
 	public LocalDate getValidade() {
@@ -101,6 +104,14 @@ public class Lote {
 		this.vacina = vacina;
 	}
 
+	public CodigoAlerta getCodigo() {
+		return this.codigo;
+	}
+
+	public void setCodigo(CodigoAlerta codigo) {
+		this.codigo = codigo;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -127,18 +138,46 @@ public class Lote {
 	}
 
 	public CodigoAlerta checarTemp() {
-		if (this.vacina.getTempMax() <= this.camara.getTemperatura()) {
+		double temp_cam = this.camara.getTemperatura();
+		double temp_margem_vac = this.vacina.getTemp_margem();
+		double temp_min_vac = this.vacina.getTempMin();
+		double temp_max_vac = this.vacina.getTempMax();
+
+		if (temp_max_vac <= temp_cam) {
+			this.codigo = CodigoAlerta.TEMP_MAX;
 			return CodigoAlerta.TEMP_MAX;
-		} else if (this.vacina.getTempMin() >= this.camara.getTemperatura()) {
+
+		} else if (temp_min_vac >= temp_cam) {
+
+			this.codigo = CodigoAlerta.TEMP_MIN;
 			return CodigoAlerta.TEMP_MIN;
-		} else if (this.vacina.getTempMax() >= this.camara.getTemperatura()
-				&& (this.vacina.getTempMax() - this.vacina.getTemp_margem()) <= this.camara.getTemperatura()) {
+
+		} else if (temp_max_vac >= temp_cam && (temp_max_vac - temp_margem_vac) <= temp_cam) {
+
+			this.codigo = CodigoAlerta.MARGEM_MAX;
 			return CodigoAlerta.MARGEM_MAX;
-		} else if (this.vacina.getTempMin() <= this.camara.getTemperatura()
-				&& (this.vacina.getTempMin() + this.vacina.getTemp_margem()) >= this.camara.getTemperatura()) {
+
+		} else if (temp_min_vac <= temp_cam && (temp_min_vac + temp_margem_vac) >= temp_cam) {
+
+			this.codigo = CodigoAlerta.MARGEM_MIN;
 			return CodigoAlerta.MARGEM_MIN;
+
 		} else {
+			this.codigo = CodigoAlerta.TEMP_OK;
 			return CodigoAlerta.TEMP_OK;
+		}
+	}
+
+	public void atualizarCam() {
+		this.checarTemp();
+		CodigoAlerta codigo = this.camara.getCodigo();
+
+		if ((this.codigo == CodigoAlerta.TEMP_MAX || this.codigo == CodigoAlerta.TEMP_MAX)
+				&& codigo != CodigoAlerta.TEMP_MAX) {
+			this.camara.setCodigo(CodigoAlerta.TEMP_MAX);
+		} else if ((this.codigo == CodigoAlerta.MARGEM_MAX || this.codigo == CodigoAlerta.MARGEM_MIN)
+				&& codigo == CodigoAlerta.TEMP_OK) {
+			this.camara.setCodigo(CodigoAlerta.MARGEM_MAX);
 		}
 	}
 }

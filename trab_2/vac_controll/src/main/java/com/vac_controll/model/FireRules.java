@@ -65,10 +65,15 @@ public class FireRules implements Runnable {
 
 		QueryResults results = null;
 
+		Iterable<Vacina> vacinas;
+		Iterable<Camara> camaras;
+		Iterable<Gestor> gestores;
+		Iterable<Lote> lotes;
+
 		while (true) {
 			try {
 				// ATUALIZANDO WORKMEMORY DE VACINAS
-				Iterable<Vacina> vacinas = this.vacRepository.findAll();
+				vacinas = this.vacRepository.findAll();
 				for (Vacina vac : vacinas) {
 					FactHandle fact = vacinas_fact.get(vac.getId());
 					if (fact != null) {
@@ -79,18 +84,39 @@ public class FireRules implements Runnable {
 				}
 
 				// ATUALIZANDO WORKMEMORY DE CAMARAS
-				Iterable<Camara> camaras = this.camRepository.findAll();
+				camaras = this.camRepository.findAll();
 				for (Camara cam : camaras) {
-					FactHandle fact = camaras_fact.get(cam.getId());
+					Long cam_id = cam.getId();
+					FactHandle fact = camaras_fact.get(cam_id);
 					if (fact != null) {
 						kSession.update(fact, cam);
 					} else {
-						camaras_fact.put(cam.getId(), kSession.insert(cam));
+						camaras_fact.put(cam_id, kSession.insert(cam));
 					}
+
+					// ATUALIZA COR DA CAMARA
+					lotes = loteRepository.findByCamaraIdAndUtilTrue(cam_id);
+					// System.out.println(lotes);
+					boolean temp_ruim = false;
+					for (Lote lote : lotes) {
+						CodigoAlerta codigo = lote.checarTemp();
+						if (codigo == CodigoAlerta.MARGEM_MIN || codigo == CodigoAlerta.MARGEM_MAX) {
+							temp_ruim = true;
+							cam.setCodigo(CodigoAlerta.MARGEM_MAX);
+						} else if (codigo == CodigoAlerta.TEMP_MIN || codigo == CodigoAlerta.TEMP_MAX) {
+							temp_ruim = true;
+							cam.setCodigo(CodigoAlerta.TEMP_MAX);
+							break;
+						}
+					}
+					if (!temp_ruim) {
+						cam.setCodigo(CodigoAlerta.TEMP_OK);
+					}
+					camRepository.save(cam);
 				}
 
 				// ATUALIZANDO WORKMEMORY DE GESTORES
-				Iterable<Gestor> gestores = this.gestorRepository.findAll();
+				gestores = this.gestorRepository.findAll();
 				for (Gestor gestor : gestores) {
 					FactHandle fact = gestores_fact.get(gestor.getId());
 					if (fact != null) {
@@ -101,7 +127,7 @@ public class FireRules implements Runnable {
 				}
 
 				// ATUALIZANDO WORKMEMORY DE LOTES
-				Iterable<Lote> lotes = this.loteRepository.findAll();
+				lotes = this.loteRepository.findAll();
 
 				for (Lote lote : lotes) {
 					FactHandle fact = lotes_fact.get(lote.getId());
@@ -150,8 +176,6 @@ public class FireRules implements Runnable {
 				}
 
 				kSession.fireAllRules();
-
-				Thread.sleep(1000);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

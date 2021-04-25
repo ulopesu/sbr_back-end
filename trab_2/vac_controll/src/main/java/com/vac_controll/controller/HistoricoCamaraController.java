@@ -19,7 +19,7 @@ public class HistoricoCamaraController {
 	private HistoricoCamaraRepository historicoCamaraRepository;
 	
 	@GetMapping(value="/{camara_id}")
-	public List<HistoricoCamara> retrive(@PathVariable("camara_id") long id) {
+	public List<HistoricoCamara> list(@PathVariable("camara_id") long id) {
 		return historicoCamaraRepository.findByCamaraId(id);
 	}
 	

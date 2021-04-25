@@ -13,6 +13,13 @@ Content-Type: application/json
 {}
 ###
 
+#   LIST BY CAMARA
+GET {{ URL_API }}/lote/camara/1
+Content-Type: application/json
+
+{}
+###
+
 
 #   RETRIEVE
 GET {{ URL_API }}/lote/
@@ -34,7 +41,7 @@ Content-Type: application/json
     "camara": {
         "id": 1
     },
-    "validade": "2021-04-24"
+    "validade": "2021-04-25"
 }
 ###
 

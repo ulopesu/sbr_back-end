@@ -8,21 +8,21 @@ function long tempoAtual(){
 	return System.currentTimeMillis();
 }
 
-function CodigoAlerta checarTempDRL(Vacina vacina, Double tempCamara) {
-	if (vacina.getTempMax() <= tempCamara) {
-		return CodigoAlerta.TEMP_MAX;
-	} else if (vacina.getTempMin() >= tempCamara) {
-		return CodigoAlerta.TEMP_MIN;
-	} else if (vacina.getTempMax() >= tempCamara
-			&& (vacina.getTempMax() - vacina.getTemp_margem()) <= tempCamara) {
-		return CodigoAlerta.MARGEM_MAX;
-	} else if (vacina.getTempMin() <= tempCamara
-			&& (vacina.getTempMin() + vacina.getTemp_margem()) >= tempCamara) {
-		return CodigoAlerta.MARGEM_MIN;
-	} else {
-		return CodigoAlerta.TEMP_OK;
-	}
-}
+//function CodigoAlerta checarTempDRL(Vacina vacina, Double tempCamara) {
+//	if (vacina.getTempMax() <= tempCamara) {
+//		return CodigoAlerta.TEMP_MAX;
+//	} else if (vacina.getTempMin() >= tempCamara) {
+//		return CodigoAlerta.TEMP_MIN;
+//	} else if (vacina.getTempMax() >= tempCamara
+//			&& (vacina.getTempMax() - vacina.getTemp_margem()) <= tempCamara) {
+//		return CodigoAlerta.MARGEM_MAX;
+//	} else if (vacina.getTempMin() <= tempCamara
+//			&& (vacina.getTempMin() + vacina.getTemp_margem()) >= tempCamara) {
+//		return CodigoAlerta.MARGEM_MIN;
+//	} else {
+//		return CodigoAlerta.TEMP_OK;
+//	}
+//}
 
 
 //rule "Lote com Temperatura Perigosa"

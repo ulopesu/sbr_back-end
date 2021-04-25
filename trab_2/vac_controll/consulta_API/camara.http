@@ -40,7 +40,6 @@ Content-Type: application/json
 
 
 #   UPDATE
-#   ESTADIO_CARIACITY:  -20.332918400404424, -40.38515350717288
 PUT {{ URL_API }}/camara/1
 Content-Type: application/json
 

@@ -30,7 +30,7 @@ Content-Type: application/json
     "nome": "Corona VAC",
     "tempMax": 20.0,
     "tempMin": 5.0,
-    "margem": 20
+    "margem": 10
 }
 ###
 
