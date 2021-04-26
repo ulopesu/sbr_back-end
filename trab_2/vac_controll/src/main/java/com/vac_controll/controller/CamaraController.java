@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vac_controll.model.Camara;
 import com.vac_controll.model.CodigoAlerta;
 import com.vac_controll.model.HistoricoCamara;
+import com.vac_controll.model.Lote;
 import com.vac_controll.repository.CamaraRepository;
 import com.vac_controll.repository.HistoricoCamaraRepository;
 import com.vac_controll.repository.LocalizacaoRepository;
+import com.vac_controll.repository.LoteRepository;
 
 @RestController
 @RequestMapping("/camara")
@@ -29,6 +31,9 @@ public class CamaraController {
 
 	@Autowired
 	private CamaraRepository camRepository;
+
+	@Autowired
+	private LoteRepository loteRepository;
 
 	@Autowired
 	private LocalizacaoRepository locRepository;
@@ -77,6 +82,25 @@ public class CamaraController {
 			}
 			double temp = cam.getTemperatura();
 			record.setTemperatura(temp);
+
+			// ATUALIZA CODIGO DA CAMARA
+			Iterable<Lote> lotes = loteRepository.findByCamaraIdAndUtilTrue(id);
+			// System.out.println(lotes);
+			boolean temp_ruim = false;
+			for (Lote lote : lotes) {
+				CodigoAlerta codigo = lote.checarTemp();
+				if (codigo == CodigoAlerta.MARGEM_MIN || codigo == CodigoAlerta.MARGEM_MAX) {
+					temp_ruim = true;
+					record.setCodigo(CodigoAlerta.MARGEM_MAX);
+				} else if (codigo == CodigoAlerta.TEMP_MIN || codigo == CodigoAlerta.TEMP_MAX) {
+					temp_ruim = true;
+					record.setCodigo(CodigoAlerta.TEMP_MAX);
+					break;
+				}
+			}
+			if (!temp_ruim) {
+				record.setCodigo(CodigoAlerta.TEMP_OK);
+			}
 
 			Camara updated = camRepository.save(record);
 

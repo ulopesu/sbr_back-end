@@ -62,7 +62,7 @@ public class Camara {
 		return temperatura;
 	}
 
-	public void setTemperatura(double temperatura) {
+	public synchronized void setTemperatura(double temperatura) {
 		System.out.println("Nova temp: " + temperatura);
 		this.temperatura = temperatura;
 	}
@@ -79,7 +79,7 @@ public class Camara {
 		return this.codigo;
 	}
 
-	public void setCodigo(CodigoAlerta codigo) {
+	public synchronized void setCodigo(CodigoAlerta codigo) {
 		this.codigo = codigo;
 	}
 

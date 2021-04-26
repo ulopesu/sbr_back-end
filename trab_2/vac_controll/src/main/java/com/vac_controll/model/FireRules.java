@@ -93,26 +93,6 @@ public class FireRules implements Runnable {
 					} else {
 						camaras_fact.put(cam_id, kSession.insert(cam));
 					}
-
-					// ATUALIZA COR DA CAMARA
-					lotes = loteRepository.findByCamaraIdAndUtilTrue(cam_id);
-					// System.out.println(lotes);
-					boolean temp_ruim = false;
-					for (Lote lote : lotes) {
-						CodigoAlerta codigo = lote.checarTemp();
-						if (codigo == CodigoAlerta.MARGEM_MIN || codigo == CodigoAlerta.MARGEM_MAX) {
-							temp_ruim = true;
-							cam.setCodigo(CodigoAlerta.MARGEM_MAX);
-						} else if (codigo == CodigoAlerta.TEMP_MIN || codigo == CodigoAlerta.TEMP_MAX) {
-							temp_ruim = true;
-							cam.setCodigo(CodigoAlerta.TEMP_MAX);
-							break;
-						}
-					}
-					if (!temp_ruim) {
-						cam.setCodigo(CodigoAlerta.TEMP_OK);
-					}
-					camRepository.save(cam);
 				}
 
 				// ATUALIZANDO WORKMEMORY DE GESTORES
@@ -138,27 +118,10 @@ public class FireRules implements Runnable {
 					}
 				}
 
-				// SINCRONIZA DESCARTES DA WORKMEMORY COM O REPOSITORIO
-				results = kSession.getQueryResults("novosDescartes");
-				for (QueryResultsRow row : results) {
-					Descarte descarte = (Descarte) row.get("descarte");
-					Lote lote = descarte.getLote();
-					notificarGestores(CodigoAlerta.DESCARTE, lote);
-
-					FactHandle fact = kSession.getFactHandle(descarte);
-					descarte = (Descarte) descarteRepository.save(descarte);
-					kSession.update(fact, descarte);
-					descarte_fact.put(descarte.getId(), fact);
-
-					lote.setUtil(false);
-					loteRepository.save(lote);
-				}
-
 				// SINCRONIZA TEMPERATURAS RUINS DA WORKMEMORY COM O REPOSITORIO
 				results = kSession.getQueryResults("novasTempRuim");
 				for (QueryResultsRow row : results) {
 					TempRuim tempRuim = (TempRuim) row.get("tempRuim");
-
 					if (tempRuim.getId() == null) {
 						FactHandle fact = kSession.getFactHandle(tempRuim);
 						tempRuim.setFoiAlterada(false);
@@ -173,9 +136,29 @@ public class FireRules implements Runnable {
 						tempRuim = (TempRuim) tempRuimRepository.save(tempRuim);
 						kSession.update(temp_ruim_fact.get(tempRuim.getId()), tempRuim);
 					}
+					tempRuim.getLote().setCodigo(tempRuim.getCodigo());
+					loteRepository.save(tempRuim.getLote());
+				}
+
+				// SINCRONIZA DESCARTES DA WORKMEMORY COM O REPOSITORIO
+				results = kSession.getQueryResults("novosDescartes");
+				for (QueryResultsRow row : results) {
+					Descarte descarte = (Descarte) row.get("descarte");
+					Lote lote = descarte.getLote();
+					notificarGestores(CodigoAlerta.DESCARTE, lote);
+
+					FactHandle fact = kSession.getFactHandle(descarte);
+					descarte = (Descarte) descarteRepository.save(descarte);
+					kSession.update(fact, descarte);
+					descarte_fact.put(descarte.getId(), fact);
+
+					lote.setCodigo(descarte.getCodigo());
+					lote.setUtil(false);
+					loteRepository.save(lote);
 				}
 
 				kSession.fireAllRules();
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

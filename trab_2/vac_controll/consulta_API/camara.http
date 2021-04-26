@@ -28,7 +28,7 @@ POST {{ URL_API }}/camara/
 Content-Type: application/json
 
 {
-    "nome": "Camara 1 - UFES",
+    "nome": "Camara 2 - UFES",
     "loc": {
         "latitude": -20.273610030740326,
         "longitude": -40.30586659439299
@@ -40,11 +40,11 @@ Content-Type: application/json
 
 
 #   UPDATE
-PUT {{ URL_API }}/camara/1
+PUT {{ URL_API }}/camara/2
 Content-Type: application/json
 
 {   
-    "temperatura": 21
+    "temperatura": 15
 }
 ###
 

@@ -34,14 +34,14 @@ POST {{ URL_API }}/lote/
 Content-Type: application/json
 
 {
-    "qtd": 50,
+    "qtd": 100,
     "vacina": {
-        "id": 1
+        "id": 3
     },
     "camara": {
-        "id": 1
+        "id": 2
     },
-    "validade": "2021-04-25"
+    "validade": "2021-04-24"
 }
 ###
 

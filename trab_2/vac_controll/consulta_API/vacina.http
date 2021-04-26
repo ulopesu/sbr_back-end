@@ -30,20 +30,20 @@ Content-Type: application/json
     "nome": "Corona VAC",
     "tempMax": 20.0,
     "tempMin": 5.0,
-    "margem": 10
+    "margem": 20
 }
 ###
 
 
 #   UPDATE
-PUT {{ URL_API }}/vacina/1/
+PUT {{ URL_API }}/vacina/3/
 Content-Type: application/json
 
 {
     "nome": "sputnik V",
-    "tempMax": 20.0,
-    "tempMin": 0.0,
-    "margem": 10
+    "tempMax": 30.0,
+    "tempMin": 1.0,
+    "margem": 20
 }
 ###
 
