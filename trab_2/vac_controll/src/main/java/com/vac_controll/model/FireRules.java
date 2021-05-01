@@ -136,8 +136,11 @@ public class FireRules implements Runnable {
 						tempRuim = (TempRuim) tempRuimRepository.save(tempRuim);
 						kSession.update(temp_ruim_fact.get(tempRuim.getId()), tempRuim);
 					}
-					tempRuim.getLote().setCodigo(tempRuim.getCodigo());
-					loteRepository.save(tempRuim.getLote());
+					Lote lote = tempRuim.getLote();
+					if(lote.isUtil()) {
+						tempRuim.getLote().setCodigo(tempRuim.getCodigo());
+						loteRepository.save(tempRuim.getLote());
+					}
 				}
 
 				// SINCRONIZA DESCARTES DA WORKMEMORY COM O REPOSITORIO

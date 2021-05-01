@@ -124,3 +124,15 @@ end
 query "novosDescartes"
 	descarte: Descarte(id == null)
 end
+
+
+
+/* 
+	FAZER:
+	- Regra para mal funcionamento da Camara.
+	- Transformar Historito Camara em: LeituraSensorTemp (EVENTO).
+	- Regra de descarte por variação brusca de temperatura usando evento.
+	- Usar TMS.
+	- TALVEZ MUDAR CHECKTEMP PARA DENTRO DO DROOLS
+	- TALVEZ REPOSITORIA PARA WORKMEMORY
+*/

@@ -40,11 +40,11 @@ Content-Type: application/json
 
 
 #   UPDATE
-PUT {{ URL_API }}/camara/2
+PUT {{ URL_API }}/camara/1
 Content-Type: application/json
 
 {   
-    "temperatura": 15
+    "temperatura": 20
 }
 ###
 

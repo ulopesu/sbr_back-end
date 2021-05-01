@@ -36,12 +36,12 @@ Content-Type: application/json
 {
     "qtd": 100,
     "vacina": {
-        "id": 3
+        "id": 1
     },
     "camara": {
-        "id": 2
+        "id": 1
     },
-    "validade": "2021-04-24"
+    "validade": "2021-04-29"
 }
 ###
 
