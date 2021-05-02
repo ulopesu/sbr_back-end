@@ -90,10 +90,6 @@ public class Camara {
 		this.codigo = codigo;
 	}
 
-	public boolean isAlertaDefeito() {
-		return this.alertaDefeito;
-	}
-
 	public void setAlertaDefeito(boolean alertaDefeito) {
 		this.alertaDefeito = alertaDefeito;
 	}

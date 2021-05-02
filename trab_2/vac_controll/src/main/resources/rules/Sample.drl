@@ -117,10 +117,10 @@ end
 rule "Possivel Defeito na Camara"
 	when
 		$camara: Camara(alertaDefeito == false)
-		$tempsRuins: ArrayList(size >= 5)
+		$tempsRuins: ArrayList(size > 4)
 					from collect( TempRuim(
 						lote.getCamara() == $camara, 
-						inicio.getTime() <= tempoAtual() && >= (tempoAtual() - Constante.SemanaEmMili)
+						(tempoAtual() - inicio.getTime()) < 10000
 						)
 					)
 	then
@@ -136,7 +136,7 @@ rule "Camara Ficou OK"
 		$tempsRuins: ArrayList(size < 5)
 					from collect( TempRuim(
 						lote.getCamara() == $camara, 
-						inicio.getTime() <= tempoAtual() && >= (tempoAtual() - Constante.SemanaEmMili)
+						(tempoAtual() - inicio.getTime()) < 10000
 						)
 					)
 	then
@@ -146,6 +146,7 @@ rule "Camara Ficou OK"
 		update($camara);
 end
 
+// Constante.SemanaEmMili
 
 // CONSULTAS (QUERIES)
 query "novasTempRuim"
@@ -166,5 +167,4 @@ end
 	- Transformar Historito Camara em: LeituraSensorTemp (EVENTO).
 	- Regra de descarte por variação brusca de temperatura usando evento.
 	- Usar TMS.
-	- TALVEZ MUDAR CHECKTEMP PARA DENTRO DO DROOLS
-*/
+	*/

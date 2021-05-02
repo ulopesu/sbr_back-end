@@ -90,11 +90,11 @@ public class FireRules implements Runnable {
 					FactHandle fact = camaras_fact.get(cam_id);
 					if (fact != null) {
 						if(cam.getFoiAlterada()){
-							cam = camRepository.findById(cam_id).map(record -> {
+							kSession.update(fact, cam);
+							camRepository.findById(cam_id).map(record -> {
 								record.setFoiAlterada(false);
 								return camRepository.save(record);
 							}).orElse(null);
-							kSession.update(fact, cam);
 						}
 					} else {
 						camaras_fact.put(cam_id, kSession.insert(cam));
@@ -181,8 +181,8 @@ public class FireRules implements Runnable {
 						kSession.update(camaras_fact.get(camRepo.getId()), camRepo);
 					}
 				}
-				kSession.fireAllRules();
 
+				kSession.fireAllRules();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
