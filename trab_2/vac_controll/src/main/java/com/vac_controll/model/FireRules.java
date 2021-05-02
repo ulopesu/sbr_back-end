@@ -85,6 +85,7 @@ public class FireRules implements Runnable {
 
 				// ATUALIZANDO WORKMEMORY DE CAMARAS
 				camaras = this.camRepository.findAll();
+
 				for (Camara cam : camaras) {
 					Long cam_id = cam.getId();
 					FactHandle fact = camaras_fact.get(cam_id);
@@ -136,8 +137,11 @@ public class FireRules implements Runnable {
 						tempRuim = (TempRuim) tempRuimRepository.save(tempRuim);
 						kSession.update(temp_ruim_fact.get(tempRuim.getId()), tempRuim);
 					}
-					tempRuim.getLote().setCodigo(tempRuim.getCodigo());
-					loteRepository.save(tempRuim.getLote());
+					Lote lote = tempRuim.getLote();
+					if(lote.isUtil()) {
+						tempRuim.getLote().setCodigo(tempRuim.getCodigo());
+						loteRepository.save(tempRuim.getLote());
+					}
 				}
 
 				// SINCRONIZA DESCARTES DA WORKMEMORY COM O REPOSITORIO
@@ -156,7 +160,19 @@ public class FireRules implements Runnable {
 					lote.setUtil(false);
 					loteRepository.save(lote);
 				}
-
+				
+				// SINCRONIZA CAMARAS DA WORKMEMORY COM O REPOSITORIO
+				results = kSession.getQueryResults("camarasAlertaDefeito");
+				for (QueryResultsRow row : results) {
+					Camara camara = (Camara) row.get("camara");
+					Camara camRepo = camRepository.findById(camara.getId()).map(record -> {
+						record.setAlertaDefeito(camara.isAlertaDefeito());
+						Camara updated = camRepository.save(record);
+						return updated;
+					}).orElse(null);
+					System.out.print("\n\n\nATUALIZA CAM DEF: ");
+					System.out.println(camRepo);
+				}
 				kSession.fireAllRules();
 
 			} catch (Exception e) {

@@ -56,6 +56,8 @@ public class CamaraController {
 
 		cam.setCodigo(CodigoAlerta.TEMP_OK);
 
+		cam.setAlertaDefeito(false);
+
 		Camara new_cam = camRepository.save(cam);
 
 		double temp = new_cam.getTemperatura();
@@ -80,6 +82,7 @@ public class CamaraController {
 			if (cam.getLoc() != null) {
 				record.setLoc(locRepository.save(cam.getLoc()));
 			}
+
 			double temp = cam.getTemperatura();
 			record.setTemperatura(temp);
 

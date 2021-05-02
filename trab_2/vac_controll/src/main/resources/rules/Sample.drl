@@ -58,8 +58,7 @@ function long tempoAtual(){
 
 rule "Lote com Temperatura Perigosa"
     when
-    	$lote: 
-		Lote(
+		$lote: Lote(
 			$codigoLote: checarTemp != CodigoAlerta.TEMP_OK, 
 			$cam:camara, 
 			$util:util == true
@@ -107,7 +106,7 @@ rule "Descarte Por Validade"
 			validade.atStartOfDay(
 				ZoneId.systemDefault()
 			).toInstant().plusMillis(
-				Constante.DiaEmMilesimos
+				Constante.DiaEmMili
 			).toEpochMilli() < tempoAtual()
 		)
 		not (exists (Descarte(lote == $lote)))
@@ -115,6 +114,20 @@ rule "Descarte Por Validade"
 		insert(new Descarte(new Date(), $lote, CodigoAlerta.VALIDADE));
 end
 
+rule "Possivel Defeito na Camara"
+	when
+		$camara: Camara(alertaDefeito == false)
+		$tempsRuins: ArrayList(size >= 5)
+					from collect( TempRuim(
+						lote.getCamara() == $camara, 
+						inicio.getTime() <= tempoAtual() && >= (tempoAtual() - Constante.SemanaEmMili)
+						)
+					)
+	then
+		System.out.println("\n\n Possivel Defeito na Camara!!! \n\n");
+		$camara.setAlertaDefeito(true);
+		update($camara);
+end
 
 // CONSULTAS (QUERIES)
 query "novasTempRuim"
@@ -124,3 +137,16 @@ end
 query "novosDescartes"
 	descarte: Descarte(id == null)
 end
+
+query "camarasAlertaDefeito"
+	camara: Camara(alertaDefeito)
+end
+
+/* 
+	FAZER:
+	- Regra para mal funcionamento da Camara.
+	- Transformar Historito Camara em: LeituraSensorTemp (EVENTO).
+	- Regra de descarte por variação brusca de temperatura usando evento.
+	- Usar TMS.
+	- TALVEZ MUDAR CHECKTEMP PARA DENTRO DO DROOLS
+*/

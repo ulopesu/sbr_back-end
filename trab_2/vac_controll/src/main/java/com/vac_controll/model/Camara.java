@@ -30,12 +30,16 @@ public class Camara {
 	@Column(nullable = true)
 	private CodigoAlerta codigo;
 
+	@Column(nullable = true)
+	private boolean alertaDefeito;
+
 	public Camara(String nome, Localizacao loc, double temperatura) {
 		super();
 		this.nome = nome;
 		this.loc = loc;
 		this.temperatura = temperatura;
 		this.codigo = CodigoAlerta.TEMP_OK;
+		this.alertaDefeito = false;
 	}
 
     public Camara() {
@@ -56,7 +60,6 @@ public class Camara {
 	public void setLoc(Localizacao loc) {
 		this.loc = loc;
 	}
-	
 	
 	public double getTemperatura() {
 		return temperatura;
@@ -81,6 +84,14 @@ public class Camara {
 
 	public synchronized void setCodigo(CodigoAlerta codigo) {
 		this.codigo = codigo;
+	}
+
+	public boolean isAlertaDefeito() {
+		return this.alertaDefeito;
+	}
+
+	public void setAlertaDefeito(boolean alertaDefeito) {
+		this.alertaDefeito = alertaDefeito;
 	}
 
 	@Override
