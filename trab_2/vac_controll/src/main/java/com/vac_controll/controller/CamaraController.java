@@ -1,5 +1,6 @@
 package com.vac_controll.controller;
 
+import java.net.URI;
 import java.util.Date;
 import java.util.Optional;
 
@@ -49,7 +50,7 @@ public class CamaraController {
 
 	@PostMapping
 	@ResponseStatus
-	public Camara create(@RequestBody Camara cam) {
+	public ResponseEntity<Camara> create(@RequestBody Camara cam) {
 		if (cam.getLoc() != null) {
 			cam.setLoc(locRepository.save(cam.getLoc()));
 		}
@@ -58,13 +59,15 @@ public class CamaraController {
 
 		cam.setAlertaDefeito(false);
 
+		cam.setFoiAlterada(false);
+
 		Camara new_cam = camRepository.save(cam);
 
 		double temp = new_cam.getTemperatura();
 		HistoricoCamara new_historico = new HistoricoCamara(new Date(), new_cam, temp);
 		historicoCamRepository.save(new_historico);
-
-		return new_cam;
+		
+		return ResponseEntity.created(URI.create("/camara/" + new_cam.getId())).body(new_cam);
 	}
 
 	@GetMapping(value = "/{id}")
@@ -85,6 +88,7 @@ public class CamaraController {
 
 			double temp = cam.getTemperatura();
 			record.setTemperatura(temp);
+			record.setFoiAlterada(true);
 
 			// ATUALIZA CODIGO DA CAMARA
 			Iterable<Lote> lotes = loteRepository.findByCamaraIdAndUtilTrue(id);

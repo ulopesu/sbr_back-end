@@ -1,5 +1,6 @@
 package com.vac_controll.controller;
 
+import java.net.URI;
 import java.util.Optional;
 
 import org.kie.api.runtime.KieSession;
@@ -33,8 +34,9 @@ public class VacinaController {
 	
 	@PostMapping
 	@ResponseStatus
-	public Vacina create(@RequestBody Vacina vac) {
-		return vacRepository.save(vac);
+	public ResponseEntity<Vacina> create(@RequestBody Vacina vac) {
+		Vacina new_vac = vacRepository.save(vac);
+		return ResponseEntity.created(URI.create("/vacina/" + new_vac.getId())).body(new_vac);
 	}
 	
 	@GetMapping(value="/{id}")

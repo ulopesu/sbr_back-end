@@ -85,12 +85,17 @@ public class FireRules implements Runnable {
 
 				// ATUALIZANDO WORKMEMORY DE CAMARAS
 				camaras = this.camRepository.findAll();
-
 				for (Camara cam : camaras) {
 					Long cam_id = cam.getId();
 					FactHandle fact = camaras_fact.get(cam_id);
 					if (fact != null) {
-						kSession.update(fact, cam);
+						if(cam.getFoiAlterada()){
+							cam = camRepository.findById(cam_id).map(record -> {
+								record.setFoiAlterada(false);
+								return camRepository.save(record);
+							}).orElse(null);
+							kSession.update(fact, cam);
+						}
 					} else {
 						camaras_fact.put(cam_id, kSession.insert(cam));
 					}
@@ -162,16 +167,19 @@ public class FireRules implements Runnable {
 				}
 				
 				// SINCRONIZA CAMARAS DA WORKMEMORY COM O REPOSITORIO
-				results = kSession.getQueryResults("camarasAlertaDefeito");
+				results = kSession.getQueryResults("camarasAlteradas");
 				for (QueryResultsRow row : results) {
 					Camara camara = (Camara) row.get("camara");
 					Camara camRepo = camRepository.findById(camara.getId()).map(record -> {
-						record.setAlertaDefeito(camara.isAlertaDefeito());
-						Camara updated = camRepository.save(record);
-						return updated;
+						if(camara.getAlertaDefeito() != record.getAlertaDefeito()){
+							record.setAlertaDefeito(camara.getAlertaDefeito());
+							record.setFoiAlterada(false);
+						}
+						return camRepository.save(record);
 					}).orElse(null);
-					System.out.print("\n\n\nATUALIZA CAM DEF: ");
-					System.out.println(camRepo);
+					if(camRepo!=null){
+						kSession.update(camaras_fact.get(camRepo.getId()), camRepo);
+					}
 				}
 				kSession.fireAllRules();
 

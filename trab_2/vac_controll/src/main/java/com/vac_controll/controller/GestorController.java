@@ -1,5 +1,6 @@
 package com.vac_controll.controller;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,7 +51,7 @@ public class GestorController {
 
 	@PostMapping
 	@ResponseStatus
-	public Gestor create(@RequestBody Gestor gestor) {
+	public ResponseEntity<Gestor> create(@RequestBody Gestor gestor) {
 		if (gestor.getLoc() != null) {
 			gestor.setLoc(locRepository.save(gestor.getLoc()));
 		}
@@ -64,7 +65,9 @@ public class GestorController {
 			});
 		}
 
-		return gestorRepository.save(gestor);
+		Gestor new_gestor = gestorRepository.save(gestor);
+
+		return ResponseEntity.created(URI.create("/gestor/" + new_gestor.getId())).body(new_gestor);
 	}
 
 	@PutMapping(value = "/{id}")

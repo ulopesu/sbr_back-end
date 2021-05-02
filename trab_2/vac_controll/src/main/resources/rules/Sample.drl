@@ -126,8 +126,26 @@ rule "Possivel Defeito na Camara"
 	then
 		System.out.println("\n\n Possivel Defeito na Camara!!! \n\n");
 		$camara.setAlertaDefeito(true);
+		$camara.setFoiAlterada(true);
 		update($camara);
 end
+
+rule "Camara Ficou OK"
+	when
+		$camara: Camara(alertaDefeito == true)
+		$tempsRuins: ArrayList(size < 5)
+					from collect( TempRuim(
+						lote.getCamara() == $camara, 
+						inicio.getTime() <= tempoAtual() && >= (tempoAtual() - Constante.SemanaEmMili)
+						)
+					)
+	then
+		System.out.println("\n\n Camara Ficou OK!!! \n\n");
+		$camara.setAlertaDefeito(false);
+		$camara.setFoiAlterada(true);
+		update($camara);
+end
+
 
 // CONSULTAS (QUERIES)
 query "novasTempRuim"
@@ -138,8 +156,8 @@ query "novosDescartes"
 	descarte: Descarte(id == null)
 end
 
-query "camarasAlertaDefeito"
-	camara: Camara(alertaDefeito)
+query "camarasAlteradas"
+	camara: Camara(foiAlterada)
 end
 
 /* 

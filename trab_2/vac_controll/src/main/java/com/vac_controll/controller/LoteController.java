@@ -1,5 +1,6 @@
 package com.vac_controll.controller;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,7 +64,7 @@ public class LoteController {
 
 	@PostMapping
 	@ResponseStatus
-	public Lote create(@RequestBody Lote lote) {
+	public ResponseEntity<Lote> create(@RequestBody Lote lote) {
 		// SET VACINA BY ID
 		if (lote.getVacina() != null) {
 			Long vac_id = lote.getVacina().getId();
@@ -98,7 +99,8 @@ public class LoteController {
 			t1.start();
 		}
 		lote.atualizarCam();
-		return loteRepository.save(lote);
+		Lote new_lote = loteRepository.save(lote);
+		return ResponseEntity.created(URI.create("/vacina/" + new_lote.getId())).body(new_lote);
 	}
 
 	@GetMapping(value = "/{id}")
