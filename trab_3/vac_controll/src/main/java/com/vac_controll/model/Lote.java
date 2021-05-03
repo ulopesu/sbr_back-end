@@ -1,7 +1,6 @@
 package com.vac_controll.model;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -14,8 +13,6 @@ import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.kie.api.runtime.rule.QueryResults;
-import org.kie.api.runtime.rule.QueryResultsRow;
 
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 
@@ -148,16 +145,7 @@ public class Lote {
 		}
 	}
 
-	public void notificarGestores(CodigoAlerta cod) {
-		List<Gestor> gestores = new ArrayList<Gestor>();
-
-		QueryResults results = Constante.kSession.getQueryResults("filterGestorByCamaraId", this.getCamara().getId());
-
-		for (QueryResultsRow row : results) {
-			Gestor gestor = (Gestor) row.get("gestor");
-			gestores.add(gestor);
-		}
-
+	public void notificarGestores(CodigoAlerta cod, List<Gestor> gestores) {
 		Gestor gMaisProx = this.getCamara().getLoc().gestorMaisProx(gestores);
 
 		for (Gestor gestor : gestores) {
