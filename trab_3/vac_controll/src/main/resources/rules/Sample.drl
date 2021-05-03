@@ -1,0 +1,210 @@
+package com.vac_controll.model;
+
+import java.util.Date;
+import java.util.ArrayList;
+import java.time.ZoneId;
+
+function long tempoAtual(){
+	return System.currentTimeMillis();
+}
+
+function CodigoAlerta checarTempDRL(Vacina vacina, Double tempCamara) {
+	System.out.println(tempCamara);
+
+	CodigoAlerta codigo;
+	if (vacina.getTempMax() <= tempCamara) {
+		codigo = CodigoAlerta.TEMP_MAX;
+	} else if (vacina.getTempMin() >= tempCamara) {
+		codigo = CodigoAlerta.TEMP_MIN;
+	} else if (vacina.getTempMax() >= tempCamara
+			&& (vacina.getTempMax() - vacina.getTemp_margem()) <= tempCamara) {
+		codigo = CodigoAlerta.MARGEM_MAX;
+	} else if (vacina.getTempMin() <= tempCamara
+			&& (vacina.getTempMin() + vacina.getTemp_margem()) >= tempCamara) {
+		codigo = CodigoAlerta.MARGEM_MIN;
+	} else {
+		codigo = CodigoAlerta.TEMP_OK;
+	}
+
+	System.out.println(codigo);
+	return codigo;
+}
+
+rule "Lote com Temperatura Perigosa"
+    when
+    	$lote: Lote(
+			$tempCam:camara.getTemperatura(), 
+			$util:util == true, 
+			$codigoLote:checarTempDRL(vacina, camara.getTemperatura()) != CodigoAlerta.TEMP_OK
+		)
+		not (exists (TempRuim(lote == $lote, fim == null)))
+    then
+		$lote.setCodigo($codigoLote);
+		update($lote);
+		insert(new TempRuim($lote, $tempCam, new Date(), $codigoLote));
+		//$lote.notificarGestores($codigoLote);
+end
+
+rule "Mudança de Estado do Lote"
+    when
+    	$lote: Lote(
+			$tempCam:camara.getTemperatura(), 
+			$vac:vacina,
+			$codigoLote:checarTempDRL(vacina, camara.getTemperatura()),
+			$util:util
+		)
+		$tempRuim: TempRuim(lote == $lote, fim == null, codigo != $codigoLote)
+    then
+		$tempRuim.setFim(new Date());
+		update($tempRuim);
+		$lote.setCodigo($codigoLote);
+		update($lote);
+		if($codigoLote != CodigoAlerta.TEMP_OK && $util == true){
+			insert(new TempRuim($lote, $tempCam, new Date(), $codigoLote));
+			//$lote.notificarGestores($codigoLote);
+		}
+end
+
+
+
+//rule "Descarte Por Temperatura"
+//	when
+//		$lote: Lote($cam:camara, $vac:vacina, util == true)
+//		TempRuim(	
+//			lote == $lote, 
+//			$inicioTime: inicio.getTime(), 
+//			fim == null, 
+//			$codigoTempRuim: codigo == CodigoAlerta.TEMP_MIN || == CodigoAlerta.TEMP_MAX
+//		)
+//		eval((tempoAtual()-$inicioTime) > Constante.LimiteExposicao)
+//		not (exists (Descarte(lote == $lote)))
+//	then
+//		insert(new Descarte(new Date(), $lote, $codigoTempRuim));
+//end
+//rule "Descarte Por Validade"
+//	when
+//		$lote: Lote(
+//			validade.atStartOfDay(
+//				ZoneId.systemDefault()
+//			).toInstant().plusMillis(
+//				Constante.DiaEmMili
+//			).toEpochMilli() < tempoAtual()
+//		)
+//		not (exists (Descarte(lote == $lote)))
+//	then
+//		insert(new Descarte(new Date(), $lote, CodigoAlerta.VALIDADE));
+//end
+//rule "Possivel Defeito na Camara"
+//	when
+//		$camara: Camara(alertaDefeito == false)
+//		$tempsRuins: ArrayList(size > 4)
+//					from collect( TempRuim(
+//						lote.getCamara() == $camara, 
+//						(tempoAtual() - inicio.getTime()) < 10000
+//						)
+//					)
+//	then
+//		System.out.println("\n\n Possivel Defeito na Camara!!! \n\n");
+//		$camara.setAlertaDefeito(true);
+//		$camara.setFoiAlterada(true);
+//		update($camara);
+//end
+//rule "Camara Ficou OK"
+//	when
+//		$camara: Camara(alertaDefeito == true)
+//		$tempsRuins: ArrayList(size < 5)
+//					from collect( TempRuim(
+//						lote.getCamara() == $camara, 
+//						(tempoAtual() - inicio.getTime()) < 10000
+//						)
+//					)
+//	then
+//		System.out.println("\n\n Camara Ficou OK!!! \n\n");
+//		$camara.setAlertaDefeito(false);
+//		$camara.setFoiAlterada(true);
+//		update($camara);
+//end
+
+// Constante.SemanaEmMili
+
+// 					CONSULTAS (QUERIES)
+
+// 		TEMP RUIM
+query "listTempRuim"
+	tempRuim: TempRuim()
+end
+
+
+
+// 		DESCARTE
+query "listDescarte"
+	descarte: Descarte()
+end
+
+
+
+// 		CAMARA
+query "listCamara"
+	camara: Camara()
+end
+
+query getCamaraById(long cam_id)
+	camara: Camara(id==cam_id)
+end
+
+
+
+// 		VACINA
+query "listVacina"
+	vacina: Vacina()
+end
+
+query getVacinaById(long vac_id)
+	vacina: Vacina(id==vac_id)
+end
+
+
+
+// 		LOTE
+query "listLote"
+	lote: Lote()
+end
+
+query getLoteById(long lote_id)
+	lote: Lote(id==lote_id)
+end
+
+query filterLotesByCamaraId(long cam_id)
+	lote: Lote(camara.getId()==cam_id)
+end
+
+
+
+// 		GESTOR
+query "listGestor"
+	gestor: Gestor()
+end
+
+query getGestorById(long gestor_id)
+	gestor: Gestor(id==gestor_id)
+end
+
+query filterGestorByCamaraId(long cam_id)
+	gestor: Gestor(camara.getId()==cam_id)
+end
+
+
+
+// 		LEITURA_SENSOR_TEMP
+query filterLeituraByCamaraId(long cam_id)
+	leitura: LeituraSensorTemp(camara.getId()==cam_id)
+end
+
+
+/* 
+	FAZER:
+	- Regra para mal funcionamento da Camara.
+	- Transformar Historito Camara em: LeituraSensorTemp (EVENTO).
+	- Regra de descarte por variação brusca de temperatura usando evento.
+	- Usar TMS.
+	*/
