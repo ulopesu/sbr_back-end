@@ -29,21 +29,9 @@ public class LoteController {
 	static Long ids = Long.valueOf(1);
 	static HashMap<Long, FactHandle> lotes_fact = new HashMap<Long, FactHandle>();
 	
-	@GetMapping
-	public List<Lote> list() {
-		List<Lote> lotes = new ArrayList<Lote>();
-
-		QueryResults results = Constante.kSession.getQueryResults("listLote");
-		for (QueryResultsRow row : results) {
-			Lote lote = (Lote) row.get("lote");
-			lotes.add(lote);
-		}
-		return lotes;
-	}
-
 	@CrossOrigin("*")
 	@GetMapping(value="/camara/{camara_id}")
-	public List<Lote> list(@PathVariable("camara_id") long id) {
+	public List<Lote> filterByCamaraId(@PathVariable("camara_id") long id) {
 		List<Lote> lotes = new ArrayList<Lote>();
 		QueryResults results = Constante.kSession.getQueryResults("filterLotesByCamaraId", id);
 		for (QueryResultsRow row : results) {
@@ -71,6 +59,7 @@ public class LoteController {
 			for (QueryResultsRow row : results) {
 				Vacina vacina = (Vacina) row.get("vacina");
 				lote.setVacina(vacina);
+				break;
 			}
 		}
 
@@ -83,6 +72,7 @@ public class LoteController {
 			for (QueryResultsRow row : results) {
 				Camara camara = (Camara) row.get("camara");
 				lote.setCamara(camara);
+				break;
 			}
 		}
 

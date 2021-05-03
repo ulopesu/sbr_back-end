@@ -9,8 +9,6 @@ function long tempoAtual(){
 }
 
 function CodigoAlerta checarTempDRL(Vacina vacina, Double tempCamara) {
-	System.out.println(tempCamara);
-
 	CodigoAlerta codigo;
 	if (vacina.getTempMax() <= tempCamara) {
 		codigo = CodigoAlerta.TEMP_MAX;
@@ -25,8 +23,8 @@ function CodigoAlerta checarTempDRL(Vacina vacina, Double tempCamara) {
 	} else {
 		codigo = CodigoAlerta.TEMP_OK;
 	}
-
-	System.out.println(codigo);
+	//System.out.println(tempCamara);
+	//System.out.println(codigo);
 	return codigo;
 }
 
@@ -42,7 +40,7 @@ rule "Lote com Temperatura Perigosa"
 		$lote.setCodigo($codigoLote);
 		update($lote);
 		insert(new TempRuim($lote, $tempCam, new Date(), $codigoLote));
-		//$lote.notificarGestores($codigoLote);
+		System.out.println("\n\n Lote com Temperatura Perigosa");
 end
 
 rule "Mudança de Estado do Lote"
@@ -63,37 +61,51 @@ rule "Mudança de Estado do Lote"
 			insert(new TempRuim($lote, $tempCam, new Date(), $codigoLote));
 			//$lote.notificarGestores($codigoLote);
 		}
+		System.out.println("\n\n Mudança de Estado do Lote");
+end
+
+rule "Descarte Por Temperatura"
+	when
+		$lote: Lote($lote_id:id, util == true)
+		TempRuim(
+			lote.getId() == $lote_id, 
+			$tempoInicio: inicio.getTime(),
+			fim == null, 
+			$codigoTempRuim: codigo == CodigoAlerta.TEMP_MIN || == CodigoAlerta.TEMP_MAX
+		)
+		eval((tempoAtual()-$tempoInicio) > Constante.LimiteExposicao)
+	then
+		$lote.setUtil(false);
+		update($lote);
+		insert(new Descarte(new Date(), $lote, $codigoTempRuim));
+		System.out.println("\n\n Descarte Por Temperatura");
+		//$lote.notificarGestores(CodigoAlerta.DESCARTE);
+end
+
+rule "Descarte Por Validade"
+	when
+		$lote: Lote(
+			util == true,
+			validade.atStartOfDay(
+				ZoneId.systemDefault()
+			).toInstant().plusMillis(
+				Constante.DiaEmMili
+			).toEpochMilli() < tempoAtual()
+		)
+	then
+		$lote.setCodigo(CodigoAlerta.VALIDADE);
+		$lote.setUtil(false);
+		update($lote);
+		System.out.println("\n\n Descarte Por Validade");
+		insert(new Descarte(new Date(), $lote, CodigoAlerta.VALIDADE));
+		//$lote.notificarGestores(CodigoAlerta.DESCARTE);
 end
 
 
 
-//rule "Descarte Por Temperatura"
-//	when
-//		$lote: Lote($cam:camara, $vac:vacina, util == true)
-//		TempRuim(	
-//			lote == $lote, 
-//			$inicioTime: inicio.getTime(), 
-//			fim == null, 
-//			$codigoTempRuim: codigo == CodigoAlerta.TEMP_MIN || == CodigoAlerta.TEMP_MAX
-//		)
-//		eval((tempoAtual()-$inicioTime) > Constante.LimiteExposicao)
-//		not (exists (Descarte(lote == $lote)))
-//	then
-//		insert(new Descarte(new Date(), $lote, $codigoTempRuim));
-//end
-//rule "Descarte Por Validade"
-//	when
-//		$lote: Lote(
-//			validade.atStartOfDay(
-//				ZoneId.systemDefault()
-//			).toInstant().plusMillis(
-//				Constante.DiaEmMili
-//			).toEpochMilli() < tempoAtual()
-//		)
-//		not (exists (Descarte(lote == $lote)))
-//	then
-//		insert(new Descarte(new Date(), $lote, CodigoAlerta.VALIDADE));
-//end
+
+
+
 //rule "Possivel Defeito na Camara"
 //	when
 //		$camara: Camara(alertaDefeito == false)
@@ -109,21 +121,7 @@ end
 //		$camara.setFoiAlterada(true);
 //		update($camara);
 //end
-//rule "Camara Ficou OK"
-//	when
-//		$camara: Camara(alertaDefeito == true)
-//		$tempsRuins: ArrayList(size < 5)
-//					from collect( TempRuim(
-//						lote.getCamara() == $camara, 
-//						(tempoAtual() - inicio.getTime()) < 10000
-//						)
-//					)
-//	then
-//		System.out.println("\n\n Camara Ficou OK!!! \n\n");
-//		$camara.setAlertaDefeito(false);
-//		$camara.setFoiAlterada(true);
-//		update($camara);
-//end
+
 
 // Constante.SemanaEmMili
 
@@ -132,6 +130,10 @@ end
 // 		TEMP RUIM
 query "listTempRuim"
 	tempRuim: TempRuim()
+end
+
+query filterTempRuimByLoteId(long lote_id)
+	tempRuim: TempRuim(lote.getId == lote_id)
 end
 
 
