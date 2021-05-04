@@ -45,13 +45,13 @@ public class CamaraController {
 
 		cam.getLoc().setId(Constante.localizacao_ids);
 		Constante.localizacao_ids++;
+		camara_facts.put(cam.getId(), Constante.kSession.insert(cam));
 
 		LeituraSensorTemp new_leitura = new LeituraSensorTemp(cam, cam.getTemperatura());
 		new_leitura.setId(leitura_ids);
+		new_leitura.setAtual(false);
 		leitura_ids++;
 		leituras_facts.put(new_leitura.getId(), Constante.kSession.insert(new_leitura));
-
-		camara_facts.put(cam.getId(), Constante.kSession.insert(cam));
 		return ResponseEntity.created(URI.create("/camara/" + cam.getId())).body(cam);
 	}
 
