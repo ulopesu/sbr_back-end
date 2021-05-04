@@ -119,37 +119,46 @@ rule "Descarte Por Validade"
 		$lote.setCodigo(CodigoAlerta.VALIDADE);
 		$lote.setUtil(false);
 		update($lote);
-		System.out.println("\n\n Descarte Por Validade");
 		insert(new Descarte(new Date(), $lote, CodigoAlerta.VALIDADE));
 		$lote.notificarGestores(CodigoAlerta.DESCARTE, $gestores);
-		//$lote.notificarGestores(CodigoAlerta.DESCARTE);
+		//System.out.println("\n\n Descarte Por Validade");
 end
 
+rule "Camara Com Alerta de Defeito"
+	when
+		$camara: Camara(alertaDefeito == false)
+		$tempsRuins: ArrayList(size >= 5) from collect( 
+						TempRuim(
+							(tempoAtual() - inicio.getTime()) < 10000,
+							lote.getCamara() == $camara
+						)
+					)
+	then
+		$camara.setAlertaDefeito(true);
+		update($camara);
+		System.out.println("\n\n COM PD \n\n");
+end
 
-
-
-
-
-//rule "Possivel Defeito na Camara"
+//rule "Camara Sem Alerta de Defeito"
 //	when
-//		$camara: Camara(alertaDefeito == false)
-//		$tempsRuins: ArrayList(size > 4)
-//					from collect( TempRuim(
-//						lote.getCamara() == $camara, 
-//						(tempoAtual() - inicio.getTime()) < 10000
+//		$camara: Camara(alertaDefeito == true)
+//		$tempsRuins: ArrayList(size < 5) from collect( 
+//						TempRuim(
+//							lote.getCamara() == $camara, 
+//							(tempoAtual() - inicio.getTime()) < 10000
 //						)
 //					)
 //	then
-//		System.out.println("\n\n Possivel Defeito na Camara!!! \n\n");
-//		$camara.setAlertaDefeito(true);
-//		$camara.setFoiAlterada(true);
+//		$camara.setAlertaDefeito(false);
 //		update($camara);
+//		System.out.println("\n\n SEM PD \n\n");
 //end
 
 
 // Constante.SemanaEmMili
 
 // 					CONSULTAS (QUERIES)
+
 
 // 		TEMP RUIM
 query "listTempRuim"
@@ -230,7 +239,6 @@ end
 /* 
 	FAZER:
 	- Regra para mal funcionamento da Camara.
-	- Transformar Historito Camara em: LeituraSensorTemp (EVENTO).
 	- Regra de descarte por variação brusca de temperatura usando evento.
 	- Usar TMS.
 	*/
