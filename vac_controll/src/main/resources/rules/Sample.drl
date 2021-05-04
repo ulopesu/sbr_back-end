@@ -1,0 +1,275 @@
+package com.vac_controll.model;
+
+import static com.vac_controll.model.FireRules.*;
+
+import java.util.Date;
+import java.util.ArrayList;
+import java.time.ZoneId;
+
+
+function CodigoAlerta checarTempDRL(Vacina vacina, Double tempCamara) {
+	CodigoAlerta codigo;
+	if (vacina.getTempMax() <= tempCamara) {
+		codigo = CodigoAlerta.TEMP_MAX;
+	} else if (vacina.getTempMin() >= tempCamara) {
+		codigo = CodigoAlerta.TEMP_MIN;
+	} else if (vacina.getTempMax() >= tempCamara
+			&& (vacina.getTempMax() - vacina.getTemp_margem()) <= tempCamara) {
+		codigo = CodigoAlerta.MARGEM_MAX;
+	} else if (vacina.getTempMin() <= tempCamara
+			&& (vacina.getTempMin() + vacina.getTemp_margem()) >= tempCamara) {
+		codigo = CodigoAlerta.MARGEM_MIN;
+	} else {
+		codigo = CodigoAlerta.TEMP_OK;
+	}
+	//System.out.println(tempCamara);
+	//System.out.println(codigo);
+	return codigo;
+}
+
+declare TempRuimEvent
+	@role(event)
+	cam_id: long
+end
+
+
+rule "Nova Leitura do Sensor"
+    when
+		$novaLeitura: LeituraSensorTemp(atual==true, $camara: camara, $temp:temperatura)
+		$lotes: ArrayList(size >= 0) from collect(
+			Lote(camara == $camara)
+		)
+    then
+		$camara.setTemperatura($temp);
+		update($camara);
+		$camara.setLotes($lotes);
+
+		$novaLeitura.setAtual(false);
+		update($novaLeitura);
+		//System.out.println("\n\n Nova Leitura do Sensor");
+end
+
+rule "Lote com Temperatura Perigosa"
+    when
+    	$lote: Lote(
+			$camara: camara,
+			$tempCam: camara.getTemperatura(), 
+			$util: util == true, 
+			$codigoLote: checarTempDRL(
+				vacina, camara.getTemperatura()
+			) != CodigoAlerta.TEMP_OK
+		)
+		not (exists (TempRuim(lote == $lote, fim == null)))
+		$gestores: ArrayList(size >= 0) from collect(
+			Gestor(camara == $camara)
+		)
+    then
+		$lote.setCodigo($codigoLote);
+		update($lote);
+		insert(new TempRuim($lote, $tempCam, new Date(), $codigoLote));
+		insert(new TempRuimEvent($camara.getId()));
+		$lote.notificarGestores($codigoLote, $gestores);
+		//System.out.println("\n\n Lote com Temperatura Perigosa");
+end
+
+rule "Mudança de Estado do Lote"
+    when
+    	$lote: Lote(
+			$camara: camara,
+			$tempCam:camara.getTemperatura(), 
+			$vac:vacina,
+			$codigoLote:checarTempDRL(vacina, camara.getTemperatura()),
+			$util:util
+		)
+		$tempRuim: TempRuim(lote == $lote, fim == null, codigo != $codigoLote)
+		$gestores: ArrayList(size >= 0) from collect(
+			Gestor(camara == $camara)
+		)
+    then
+		$tempRuim.setFim(new Date());
+		update($tempRuim);
+		$lote.setCodigo($codigoLote);
+		update($lote);
+		if($codigoLote != CodigoAlerta.TEMP_OK && $util == true){
+			insert(new TempRuim($lote, $tempCam, new Date(), $codigoLote));
+			insert(new TempRuimEvent($camara.getId()));
+			$lote.notificarGestores($codigoLote, $gestores);
+		}
+		//System.out.println("\n\n Mudança de Estado do Lote");
+end
+
+rule "Descarte Por Temperatura"
+	when
+		$lote: Lote(
+			$camara: camara,
+			$lote_id:id, 
+			util == true
+		)
+		TempRuim(
+			lote.getId() == $lote_id, 
+			$tempoInicio: inicio.getTime(),
+			fim == null, 
+			$codigoTempRuim: codigo == CodigoAlerta.TEMP_MIN || == CodigoAlerta.TEMP_MAX
+		)
+		eval((tempoAtual()-$tempoInicio) > Constante.LimiteExposicao)
+		$gestores: ArrayList(size >= 0) from collect(
+			Gestor(camara == $camara)
+		)
+	then
+		$lote.setUtil(false);
+		update($lote);
+		insert(new Descarte(new Date(), $lote, $codigoTempRuim));
+		$lote.notificarGestores(CodigoAlerta.DESCARTE, $gestores);
+		//System.out.println("\n\n Descarte Por Temperatura");
+end
+
+rule "Descarte Por Validade"
+	when
+		$lote: Lote(
+			$camara: camara,
+			util == true,
+			validade.atStartOfDay(
+				ZoneId.systemDefault()
+			).toInstant().plusMillis(
+				Constante.DiaEmMili
+			).
+			toEpochMilli() < tempoAtual()
+		)
+		$gestores: ArrayList(size >= 0) from collect(
+			Gestor(camara == $camara)
+		)
+	then
+		$lote.setCodigo(CodigoAlerta.VALIDADE);
+		$lote.setUtil(false);
+		update($lote);
+		insert(new Descarte(new Date(), $lote, CodigoAlerta.VALIDADE));
+		$lote.notificarGestores(CodigoAlerta.DESCARTE, $gestores);
+		//System.out.println("\n\n Descarte Por Validade");
+end
+
+rule "Camara Com Alerta de Defeito"
+	when
+		$camara: Camara(alertaDefeito == false)
+
+		ArrayList( size >= 5 ) from collect( 
+			TempRuimEvent( 
+				cam_id == $camara.getId() 
+			) over window:time(10s) 
+		)
+
+		$lotes: ArrayList(size >= 0) from collect(
+			Lote(camara == $camara)
+		)
+	then
+		$camara.setAlertaDefeito(true);
+		update($camara);
+		$camara.setLotes($lotes);
+		//System.out.println("\n\n COM PD \n\n");
+end
+
+
+rule "Camara Sem Alerta de Defeito"
+	when
+		$camara: Camara(alertaDefeito == true)
+
+		ArrayList( size < 5 ) from collect( 
+			TempRuimEvent( 
+				cam_id == $camara.getId() 
+			) over window:time(10s) 
+		)
+		$lotes: ArrayList(size >= 0) from collect(
+			Lote(camara == $camara)
+		)
+	then
+		$camara.setAlertaDefeito(false);
+		update($camara);
+		$camara.setLotes($lotes);
+		//System.out.println("\n\n SEM PD \n\n");
+end
+
+
+
+// 					CONSULTAS (QUERIES)
+
+
+// 		TEMP RUIM
+query "listTempRuim"
+	tempRuim: TempRuim()
+end
+
+query filterTempRuimByLoteId(long lote_id)
+	tempRuim: TempRuim(lote.getId == lote_id)
+end
+
+
+
+// 		DESCARTE
+query "listDescarte"
+	descarte: Descarte()
+end
+
+
+
+// 		CAMARA
+query "listCamara"
+	camara: Camara()
+end
+
+query getCamaraById(long cam_id)
+	camara: Camara(id==cam_id)
+end
+
+
+
+// 		VACINA
+query "listVacina"
+	vacina: Vacina()
+end
+
+query getVacinaById(long vac_id)
+	vacina: Vacina(id==vac_id)
+end
+
+
+
+// 		LOTE
+query "listLote"
+	lote: Lote()
+end
+
+query getLoteById(long lote_id)
+	lote: Lote(id==lote_id)
+end
+
+query filterLotesByCamaraId(long cam_id)
+	lote: Lote(camara.getId()==cam_id)
+end
+
+
+
+// 		GESTOR
+query "listGestor"
+	gestor: Gestor()
+end
+
+query getGestorById(long gestor_id)
+	gestor: Gestor(id==gestor_id)
+end
+
+query filterGestorByCamaraId(long cam_id)
+	gestor: Gestor(camara.getId()==cam_id)
+end
+
+
+
+// 		LEITURA_SENSOR_TEMP
+query filterLeituraByCamaraId(long cam_id)
+	leitura: LeituraSensorTemp(camara.getId()==cam_id)
+end
+
+
+/* 
+	FAZER:
+	- Regra de descarte por variação brusca de temperatura usando evento.
+	- Usar TMS.
+*/

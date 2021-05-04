@@ -1,0 +1,14 @@
+###
+###     DESCARTE
+###
+
+@URL_API = http://127.0.0.1:8080
+@contentType = application/json
+
+
+#   LIST
+GET {{ URL_API }}/descarte/
+Content-Type: application/json
+
+{}
+###

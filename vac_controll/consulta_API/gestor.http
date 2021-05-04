@@ -1,0 +1,73 @@
+###
+###     CRUD GESTOR
+###
+
+@URL_API = http://127.0.0.1:8080
+@contentType = application/json
+
+
+#   CREATE
+#   SHOP_VIX:           -20.312728328794147, -40.2880710598846
+POST {{ URL_API }}/gestor/
+Content-Type: application/json
+
+{
+    "nome": "Isabel",
+    "email": "isa@ufes.br",
+    "telefone": "(27) 99999-9999",
+    "loc": {
+        "latitude": -20.312728328794147,
+        "longitude": -40.2880710598846
+    },
+    "camara": {
+        "id": 1
+    }
+}
+###
+
+#   ESTADIO_CARIACITY:  -20.332918400404424, -40.38515350717288
+POST {{ URL_API }}/gestor/
+Content-Type: application/json
+
+{
+    "nome": "Usiel",
+    "email": "usi@ufes.br",
+    "telefone": "(27) 99999-9999",
+    "loc": {
+        "latitude": -20.332918400404424,
+        "longitude": -40.38515350717288
+    },
+    "camara": {
+        "id": 1
+    }
+}
+###
+
+#   UPDATE
+PUT {{ URL_API }}/gestor/2
+Content-Type: application/json
+
+{
+    "nome": "Patricia",
+    "email": "pat@ufes.br",
+    "telefone": "(27) 98888-8888",
+    "loc": {
+        "latitude": -20.33262247031378,
+        "longitude": -40.377734714473526
+    },
+    "cam": null
+}
+###
+
+#   DELETE
+DELETE  {{ URL_API }}/gestor/1
+Content-Type: application/json
+
+{}
+
+###
+
+
+
+
+
