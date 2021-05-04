@@ -1,5 +1,7 @@
 package com.vac_controll.model;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,8 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
 import org.kie.api.runtime.rule.FactHandle;
-import org.kie.api.runtime.rule.QueryResults;
-import org.kie.api.runtime.rule.QueryResultsRow;
+
+
 
 @Entity
 public class Camara {
@@ -97,46 +99,13 @@ public class Camara {
 		return this.alertaDefeito;
 	}
 
-	public void atualizarCodigo() {
-		boolean temp_ruim = false;
-		QueryResults query_lotes = Constante.kSession.getQueryResults("filterLotesByCamaraId", this.id);
-		for (QueryResultsRow row_lote : query_lotes) {
-			Lote lote = (Lote) row_lote.get("lote");
-			if (lote.isUtil()) {
-				CodigoAlerta codigo = lote.getCodigo();
-				if (codigo == CodigoAlerta.MARGEM_MIN || codigo == CodigoAlerta.MARGEM_MAX) {
-					temp_ruim = true;
-					this.setCodigo(CodigoAlerta.MARGEM_MAX);
-				} else if (codigo == CodigoAlerta.TEMP_MIN || codigo == CodigoAlerta.TEMP_MAX) {
-					temp_ruim = true;
-					this.setCodigo(CodigoAlerta.TEMP_MAX);
-				}
-			}
-		}
-		if (!temp_ruim) {
-			this.setCodigo(CodigoAlerta.TEMP_OK);
-		}
+	public void setLotes(List<Lote> lotes) {
+		FactHandle lote_fact;
 
-		FactHandle camara_fact = Constante.kSession.getFactHandle(this);
-		Constante.kSession.update(camara_fact, this);
-
-		for (QueryResultsRow row_lote : query_lotes) {
-			Lote lote = (Lote) row_lote.get("lote");
-			if (lote.isUtil()) {
-				lote.setCamara(this);
-				FactHandle lote_fact = Constante.kSession.getFactHandle(lote);
-				Constante.kSession.update(lote_fact, lote);
-
-				QueryResults query_temps = Constante.kSession.getQueryResults("filterTempRuimByLoteId", lote.getId());
-				for (QueryResultsRow row_temp : query_temps) {
-					TempRuim tempRuim = (TempRuim) row_temp.get("tempRuim");
-					if (tempRuim.getFim() == null) {
-						tempRuim.setLote(lote);
-						FactHandle temp_fact = Constante.kSession.getFactHandle(tempRuim);
-						Constante.kSession.update(temp_fact, tempRuim);
-					}
-				}
-			}
+		for(Lote lote : lotes){
+			lote_fact = Constante.kSession.getFactHandle(lote);
+			lote.setCamara(this);
+			Constante.kSession.update(lote_fact, lote);
 		}
 	}
 }

@@ -23,8 +23,6 @@ import com.vac_controll.model.Camara;
 import com.vac_controll.model.CodigoAlerta;
 import com.vac_controll.model.Constante;
 import com.vac_controll.model.LeituraSensorTemp;
-import com.vac_controll.model.Lote;
-import com.vac_controll.model.TempRuim;
 
 @RestController
 @RequestMapping("/camara")
@@ -62,39 +60,13 @@ public class CamaraController {
 		FactHandle fact = camara_facts.get(id);
 		if (fact != null) {
 			Camara camara = (Camara) Constante.kSession.getObject(fact);
-			camara.setTemperatura(cam.getTemperatura());
-			Constante.kSession.update(fact, camara);
 
-			LeituraSensorTemp new_leitura = new LeituraSensorTemp(camara, camara.getTemperatura());
+			LeituraSensorTemp new_leitura = new LeituraSensorTemp(camara, cam.getTemperatura());
+
 			new_leitura.setId(leitura_ids);
 			leitura_ids++;
 			leituras_facts.put(new_leitura.getId(), Constante.kSession.insert(new_leitura));
 
-			QueryResults query_lotes = Constante.kSession.getQueryResults(
-				"filterLotesByCamaraId", 
-				camara.getId()
-			);
-			for (QueryResultsRow row_lote : query_lotes) {
-				Lote lote = (Lote) row_lote.get("lote");
-				if (lote.isUtil()) {
-					lote.setCamara(camara);
-					FactHandle lote_fact = Constante.kSession.getFactHandle(lote);
-					Constante.kSession.update(lote_fact, lote);
-
-					QueryResults query_temps = Constante.kSession.getQueryResults(
-						"filterTempRuimByLoteId",
-						lote.getId()
-					);
-					for (QueryResultsRow row_temp : query_temps) {
-						TempRuim tempRuim = (TempRuim) row_temp.get("tempRuim");
-						if(tempRuim.getFim()==null){
-							tempRuim.setLote(lote);
-							FactHandle temp_fact = Constante.kSession.getFactHandle(tempRuim);
-							Constante.kSession.update(temp_fact, tempRuim);
-						}
-					}
-				}
-			}
 			return ResponseEntity.ok().body(camara);
 		} else {
 			return ResponseEntity.notFound().build();

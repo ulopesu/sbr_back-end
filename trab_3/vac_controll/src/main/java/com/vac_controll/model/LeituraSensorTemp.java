@@ -36,6 +36,9 @@ public class LeituraSensorTemp {
     @Column(nullable = false)
 	private double temperatura;
 
+    @Column(nullable = true)
+	private boolean atual;
+
 
     public LeituraSensorTemp(Camara camara, double temperatura) {
 		super();
@@ -43,6 +46,7 @@ public class LeituraSensorTemp {
 		this.temperatura = temperatura;
 		this.data = new Date();
 		this.timemilli = this.data.getTime();
+        this.atual = true;
     }
 
     public LeituraSensorTemp() {
@@ -79,4 +83,21 @@ public class LeituraSensorTemp {
     public void setTemperatura(double temperatura) {
         this.temperatura = temperatura;
     }
+
+    public double getTimemilli() {
+        return this.timemilli;
+    }
+
+    public void setTimemilli(double timemilli) {
+        this.timemilli = timemilli;
+    }
+
+    public boolean isAtual() {
+        return this.atual;
+    }
+
+    public void setAtual(boolean atual) {
+        this.atual = atual;
+    }
+
 }

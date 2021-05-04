@@ -1,5 +1,7 @@
 package com.vac_controll.model;
 
+import static com.vac_controll.model.FireRules.*;
+
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -98,5 +100,13 @@ public class TempRuim {
 	
 	public void setCodigo(CodigoAlerta codigo) {
 		this.codigo = codigo;
+	}
+
+	public boolean estaNaJanela(){
+		System.out.println("\n\n TEMPO: "+ tempoAtual() + " / INICIO: "+ this.inicio.getTime());
+		System.out.println(tempoAtual() - this.inicio.getTime());
+		boolean result = (tempoAtual() - this.inicio.getTime()) < 10000;
+		System.out.println(result);
+		return result;
 	}
 }

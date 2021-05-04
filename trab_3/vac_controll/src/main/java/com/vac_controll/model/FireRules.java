@@ -1,8 +1,5 @@
 package com.vac_controll.model;
 
-import org.kie.api.runtime.rule.QueryResults;
-import org.kie.api.runtime.rule.QueryResultsRow;
-
 public class FireRules implements Runnable {
 
 	public FireRules() {
@@ -13,16 +10,14 @@ public class FireRules implements Runnable {
 		while (true) {
 			try {
 				Constante.kSession.fireAllRules();
-				QueryResults results = Constante.kSession.getQueryResults("listCamara");
-
-				for (QueryResultsRow row : results) {
-					Camara camara = (Camara) row.get("camara");
-					camara.atualizarCodigo();
-				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public static long tempoAtual(){
+		return System.currentTimeMillis();
 	}
 }
 
