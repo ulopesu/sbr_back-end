@@ -27,11 +27,10 @@ function CodigoAlerta checarTempDRL(Vacina vacina, Double tempCamara) {
 	return codigo;
 }
 
-declare TempRuimEvent
+declare TempRuimEventCam
 	@role(event)
 	cam_id: long
 end
-
 
 rule "Nova Leitura do Sensor"
     when
@@ -39,10 +38,13 @@ rule "Nova Leitura do Sensor"
 		$lotes: ArrayList(size >= 0) from collect(
 			Lote(camara == $camara)
 		)
+		$tempsRuim: ArrayList(size >= 0) from collect(
+			TempRuim()
+		)
     then
 		$camara.setTemperatura($temp);
 		update($camara);
-		$camara.setLotes($lotes);
+		$camara.setLotes($lotes, $tempsRuim);
 
 		$novaLeitura.setAtual(false);
 		update($novaLeitura);
@@ -67,7 +69,8 @@ rule "Lote com Temperatura Perigosa"
 		$lote.setCodigo($codigoLote);
 		update($lote);
 		insert(new TempRuim($lote, $tempCam, new Date(), $codigoLote));
-		insert(new TempRuimEvent($camara.getId()));
+		insert(new TempRuimEventCam($camara.getId()));
+		
 		$lote.notificarGestores($codigoLote, $gestores);
 		//System.out.println("\n\n Lote com Temperatura Perigosa");
 end
@@ -92,36 +95,47 @@ rule "Mudança de Estado do Lote"
 		update($lote);
 		if($codigoLote != CodigoAlerta.TEMP_OK && $util == true){
 			insert(new TempRuim($lote, $tempCam, new Date(), $codigoLote));
-			insert(new TempRuimEvent($camara.getId()));
+			insert(new TempRuimEventCam($camara.getId()));
 			$lote.notificarGestores($codigoLote, $gestores);
 		}
 		//System.out.println("\n\n Mudança de Estado do Lote");
 end
 
+
 rule "Descarte Por Temperatura"
 	when
-		$lote: Lote(
+		$lote: Lote (
 			$camara: camara,
-			$lote_id:id, 
+			$vacina: vacina,
 			util == true
 		)
-		TempRuim(
-			lote.getId() == $lote_id, 
-			$tempoInicio: inicio.getTime(),
-			fim == null, 
-			$codigoTempRuim: codigo == CodigoAlerta.TEMP_MIN || == CodigoAlerta.TEMP_MAX
+
+		$media: Number( 
+				doubleValue > $vacina.getTempMax() || 
+				doubleValue < $vacina.getTempMin()
+			) from accumulate(
+        	LeituraSensorTemp( 
+				$temp : temperatura,
+				camara == $camara
+			) over window:time( 30s ),
+        	average( $temp )
 		)
-		eval((tempoAtual()-$tempoInicio) > Constante.LimiteExposicao)
+
 		$gestores: ArrayList(size >= 0) from collect(
 			Gestor(camara == $camara)
 		)
 	then
 		$lote.setUtil(false);
 		update($lote);
-		insert(new Descarte(new Date(), $lote, $codigoTempRuim));
+		if ($media.doubleValue() >= $vacina.getTempMax()) {
+			insert(new Descarte(new Date(), $lote, CodigoAlerta.TEMP_MAX));
+		} else {
+			insert(new Descarte(new Date(), $lote, CodigoAlerta.TEMP_MIN));
+		}
 		$lote.notificarGestores(CodigoAlerta.DESCARTE, $gestores);
 		//System.out.println("\n\n Descarte Por Temperatura");
 end
+
 
 rule "Descarte Por Validade"
 	when
@@ -147,23 +161,27 @@ rule "Descarte Por Validade"
 		//System.out.println("\n\n Descarte Por Validade");
 end
 
+
 rule "Camara Com Alerta de Defeito"
 	when
 		$camara: Camara(alertaDefeito == false)
 
 		ArrayList( size >= 5 ) from collect( 
-			TempRuimEvent( 
+			TempRuimEventCam ( 
 				cam_id == $camara.getId() 
 			) over window:time(10s) 
 		)
-
+		
 		$lotes: ArrayList(size >= 0) from collect(
 			Lote(camara == $camara)
+		)
+		$tempsRuim: ArrayList(size >= 0) from collect(
+			TempRuim()
 		)
 	then
 		$camara.setAlertaDefeito(true);
 		update($camara);
-		$camara.setLotes($lotes);
+		$camara.setLotes($lotes, $tempsRuim);
 		//System.out.println("\n\n COM PD \n\n");
 end
 
@@ -173,17 +191,20 @@ rule "Camara Sem Alerta de Defeito"
 		$camara: Camara(alertaDefeito == true)
 
 		ArrayList( size < 5 ) from collect( 
-			TempRuimEvent( 
+			TempRuimEventCam( 
 				cam_id == $camara.getId() 
 			) over window:time(10s) 
 		)
 		$lotes: ArrayList(size >= 0) from collect(
 			Lote(camara == $camara)
 		)
+		$tempsRuim: ArrayList(size >= 0) from collect(
+			TempRuim()
+		)
 	then
 		$camara.setAlertaDefeito(false);
 		update($camara);
-		$camara.setLotes($lotes);
+		$camara.setLotes($lotes, $tempsRuim);
 		//System.out.println("\n\n SEM PD \n\n");
 end
 
@@ -197,8 +218,8 @@ query "listTempRuim"
 	tempRuim: TempRuim()
 end
 
-query filterTempRuimByLoteId(long lote_id)
-	tempRuim: TempRuim(lote.getId == lote_id)
+query filterTempRuimByLoteId(Lote lote)
+	tempRuim: TempRuim(lote == lote)
 end
 
 
