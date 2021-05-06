@@ -12,8 +12,6 @@ import javax.persistence.OneToOne;
 
 import org.kie.api.runtime.rule.FactHandle;
 
-
-
 @Entity
 public class Camara {
 
@@ -99,13 +97,26 @@ public class Camara {
 		return this.alertaDefeito;
 	}
 
-	public void setLotes(List<Lote> lotes) {
-		FactHandle lote_fact;
+	public void setLotes(List<Lote> lotes, List<TempRuim> tempsRuins) {
+		FactHandle lote_fact, temp_fact;
 
 		for(Lote lote : lotes){
-			lote_fact = Constante.kSession.getFactHandle(lote);
-			lote.setCamara(this);
-			Constante.kSession.update(lote_fact, lote);
+			if(lote.isUtil()) {
+				lote_fact = Constante.kSession.getFactHandle(lote);
+				lote.setCamara(this);
+				Constante.kSession.update(lote_fact, lote);
+	
+				// ATUALIZAR TEMPS RUINS DOS LOTES
+				for(TempRuim temp : tempsRuins){
+					if(	temp.getLote().isUtil() &&
+						temp.getLote().getId() == lote.getId()
+					){
+						temp.setLote(lote);
+						temp_fact = Constante.kSession.getFactHandle(temp);
+						Constante.kSession.update(temp_fact, temp);
+					}
+				}
+			}
 		}
 	}
 }
