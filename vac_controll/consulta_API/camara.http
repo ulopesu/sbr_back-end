@@ -25,7 +25,7 @@ Content-Type: application/json
         "latitude": -20.273610030740326,
         "longitude": -40.30586659439299
     },
-    "temperatura": 18.0
+    "temperatura": 10.0
 }
 ###
 
@@ -35,7 +35,7 @@ PUT {{ URL_API }}/camara/1
 Content-Type: application/json
 
 {   
-    "temperatura": 5
+    "temperatura": 10
 }
 ###
 

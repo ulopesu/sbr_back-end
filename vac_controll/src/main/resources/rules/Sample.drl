@@ -36,7 +36,7 @@ rule "Nova Leitura do Sensor"
     when
 		$novaLeitura: LeituraSensorTemp(atual==true, $camara: camara, $temp:temperatura)
 		$lotes: ArrayList(size >= 0) from collect(
-			Lote(camara == $camara)
+			Lote(util == true, camara == $camara)
 		)
 		$tempsRuim: ArrayList(size >= 0) from collect(
 			TempRuim()
@@ -173,7 +173,7 @@ rule "Camara Com Alerta de Defeito"
 		)
 		
 		$lotes: ArrayList(size >= 0) from collect(
-			Lote(camara == $camara)
+			Lote(util == true, camara == $camara)
 		)
 		$tempsRuim: ArrayList(size >= 0) from collect(
 			TempRuim()
@@ -196,7 +196,7 @@ rule "Camara Sem Alerta de Defeito"
 			) over window:time(10s) 
 		)
 		$lotes: ArrayList(size >= 0) from collect(
-			Lote(camara == $camara)
+			Lote(util == true, camara == $camara)
 		)
 		$tempsRuim: ArrayList(size >= 0) from collect(
 			TempRuim()
@@ -209,6 +209,94 @@ rule "Camara Sem Alerta de Defeito"
 end
 
 
+rule "Camara Codigo OK"
+    when
+		$camara: Camara(codigo != CodigoAlerta.TEMP_OK)
+
+		not (exists (Lote(
+			util == true,
+			camara == $camara,
+			checarTempDRL(
+				vacina, camara.getTemperatura()
+			) != CodigoAlerta.TEMP_OK
+		)))
+
+		$lotes: ArrayList(size >= 0) from collect(
+			Lote(util == true, camara == $camara)
+		)
+		$tempsRuim: ArrayList(size >= 0) from collect(
+			TempRuim()
+		)
+    then
+		$camara.setCodigo(CodigoAlerta.TEMP_OK);
+		update($camara);
+		$camara.setLotes($lotes, $tempsRuim);
+		//System.out.println("\n\n Camara Codigo OK");
+end
+
+
+rule "Camara Codigo MARGEM"
+    when
+		$camara: Camara(
+			codigo != CodigoAlerta.MARGEM_MAX
+		)
+
+		Lote(
+			util == true,
+			camara == $camara,
+			checarTempDRL(
+				vacina, camara.getTemperatura()
+			) 	== CodigoAlerta.MARGEM_MAX ||
+				== CodigoAlerta.MARGEM_MIN
+		)
+
+		not (exists (Lote(
+			util == true,
+			camara == $camara,
+			checarTempDRL(
+				vacina, camara.getTemperatura()
+			) 	== CodigoAlerta.TEMP_MAX ||
+				== CodigoAlerta.TEMP_MIN
+		)))
+
+		$lotes: ArrayList(size >= 0) from collect(
+			Lote(util == true, camara == $camara)
+		)
+		$tempsRuim: ArrayList(size >= 0) from collect(
+			TempRuim()
+		)
+    then
+		$camara.setCodigo(CodigoAlerta.MARGEM_MAX);
+		update($camara);
+		$camara.setLotes($lotes, $tempsRuim);
+		//System.out.println("\n\n Camara Codigo MARGEM");
+end
+
+rule "Camara Codigo TEMP_MAX"
+    when
+		$camara: Camara(codigo != CodigoAlerta.TEMP_MAX)
+
+		Lote(
+			util == true,
+			camara == $camara,
+			$codigoLote:checarTempDRL(
+				vacina, camara.getTemperatura()
+			) 	== CodigoAlerta.TEMP_MAX ||
+				== CodigoAlerta.TEMP_MIN
+		)
+
+		$lotes: ArrayList(size >= 0) from collect(
+			Lote(util == true, camara == $camara)
+		)
+		$tempsRuim: ArrayList(size >= 0) from collect(
+			TempRuim()
+		)
+    then
+		$camara.setCodigo(CodigoAlerta.TEMP_MAX);
+		update($camara);
+		$camara.setLotes($lotes, $tempsRuim);
+		//System.out.println("\n\n Camara Codigo TEMP_MAX");
+end
 
 // 					CONSULTAS (QUERIES)
 

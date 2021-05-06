@@ -69,7 +69,7 @@ public class Camara {
 	}
 
 	public synchronized void setTemperatura(double temperatura) {
-		System.out.println("Nova temp: " + temperatura);
+		//System.out.println("Nova temp: " + temperatura);
 		this.temperatura = temperatura;
 	}
 
