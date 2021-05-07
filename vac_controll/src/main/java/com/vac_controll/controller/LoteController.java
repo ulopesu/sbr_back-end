@@ -38,6 +38,8 @@ public class LoteController {
 			Lote lote = (Lote) row.get("lote");
 			lotes.add(lote);
 		}
+
+		lotes.sort(Lote::compareById);
 		return lotes;
 	}
 

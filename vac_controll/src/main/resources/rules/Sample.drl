@@ -175,7 +175,7 @@ rule "Camara Com Alerta de Defeito"
 		ArrayList( size >= 5 ) from collect( 
 			TempRuimEventCam ( 
 				cam_id == $camara.getId() 
-			) over window:time(10s) 
+			) over window:time(1m) 
 		)
 		
 		$lotes: ArrayList(size >= 0) from collect(
@@ -199,7 +199,7 @@ rule "Camara Sem Alerta de Defeito"
 		ArrayList( size < 5 ) from collect( 
 			TempRuimEventCam( 
 				cam_id == $camara.getId() 
-			) over window:time(10s) 
+			) over window:time(1m) 
 		)
 		$lotes: ArrayList(size >= 0) from collect(
 			Lote(util == true, camara == $camara)

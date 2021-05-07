@@ -62,7 +62,6 @@ public class CamaraController {
 			Camara camara = (Camara) Constante.kSession.getObject(fact);
 
 			LeituraSensorTemp new_leitura = new LeituraSensorTemp(camara, cam.getTemperatura());
-
 			new_leitura.setId(leitura_ids);
 			leitura_ids++;
 			leituras_facts.put(new_leitura.getId(), Constante.kSession.insert(new_leitura));
@@ -83,6 +82,7 @@ public class CamaraController {
 			Camara camara = (Camara) row.get("camara");
 			camaras.add(camara);
 		}
+		camaras.sort(Camara::compareById);
 		return camaras;
 	}
 
@@ -95,6 +95,12 @@ public class CamaraController {
 		for (QueryResultsRow row : results) {
 			LeituraSensorTemp leitura = (LeituraSensorTemp) row.get("leitura");
 			leituras.add(leitura);
+		}
+		leituras.sort(LeituraSensorTemp::compareById);
+
+		// RETORNAR APENAS AS ULTIMAS 10 LEITURAS
+		if(leituras.size()>10){
+			return leituras.subList(leituras.size()-11, leituras.size()-1);
 		}
 		return leituras;
 	}

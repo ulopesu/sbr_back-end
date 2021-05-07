@@ -114,6 +114,10 @@ public class Lote {
 		this.codigo = codigo;
 	}
 
+	public static int compareById(Lote l1, Lote l2){
+		return l2.getId().compareTo(l1.getId());
+	}
+
 	public CodigoAlerta checarTemp() {
 		double temp_cam = this.camara.getTemperatura();
 		double temp_margem_vac = this.vacina.getTemp_margem();

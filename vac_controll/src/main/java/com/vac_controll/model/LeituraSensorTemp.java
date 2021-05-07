@@ -100,4 +100,10 @@ public class LeituraSensorTemp {
         this.atual = atual;
     }
 
+    public static int compareById(
+        LeituraSensorTemp l1,
+        LeituraSensorTemp l2
+        ){
+            return l1.getId().compareTo(l2.getId());
+    }
 }

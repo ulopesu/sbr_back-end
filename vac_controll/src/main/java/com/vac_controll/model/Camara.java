@@ -97,6 +97,11 @@ public class Camara {
 		return this.alertaDefeito;
 	}
 
+
+	public static int compareById(Camara c1, Camara c2){
+		return c1.getId().compareTo(c2.getId());
+	}
+
 	public void setLotes(List<Lote> lotes, List<TempRuim> tempsRuins) {
 		FactHandle lote_fact, temp_fact;
 
